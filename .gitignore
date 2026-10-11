@@ -1,0 +1,22 @@
+# Configuracion local con credenciales (NO subir)
+app/config/config.php
+
+# IDE
+.idea/
+.vscode/
+*.code-workspace
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs y temporales
+*.log
+logs/
+tmp/
+*.sql.bak
+
+# Exportaciones locales
+*.pdf
+*.zip

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistema de Administracion Academica - I.E.P. Sagrado Corazon de Jesus</title>
+<style>
+  :root{--azul:#16305c;--azul-claro:#2c4f86;--fondo:#f2f5fa;--texto:#1f2937}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Segoe UI",Arial,sans-serif;background:var(--fondo);color:var(--texto);
+       display:flex;min-height:100vh;align-items:center;justify-content:center}
+  .tarjeta{background:#fff;max-width:640px;width:92%;padding:40px;border-radius:12px;
+           box-shadow:0 8px 24px rgba(22,48,92,.12);text-align:center}
+  h1{font-size:1.5rem;color:var(--azul);margin-bottom:6px}
+  h2{font-size:1rem;color:var(--azul-claro);font-weight:500;margin-bottom:20px}
+  p{margin-bottom:10px}
+  .aviso{background:#eef3fb;border-left:4px solid var(--azul-claro);padding:12px;
+         border-radius:6px;text-align:left;font-size:.9rem;margin-top:20px}
+  ul{text-align:left;margin:16px auto;max-width:420px;font-size:.9rem;list-style:none}
+  li{padding:6px 0 6px 22px;position:relative}
+  li::before{content:"›";position:absolute;left:6px;color:var(--azul-claro);font-weight:700}
+  .pie{margin-top:24px;font-size:.8rem;color:#6b7280}
+</style>
+</head>
+<body>
+  <main class="tarjeta">
+    <h1>I.E.P. Sagrado Corazon de Jesus</h1>
+    <h2>Sistema web de administracion academica para la gestion docente y directiva</h2>
+    <p>Curso: Programacion Grafica y Multimedia I &middot; Chiclayo</p>
+    <ul>
+      <li>Arquitectura MVC propia en PHP 8 y API REST JSON</li>
+      <li>Base de datos MySQL con consultas preparadas</li>
+      <li>Perfiles de acceso: DOCENTE y DIRECTOR</li>
+    </ul>
+    <div class="aviso">
+      Sprint 0 completado: entorno y repositorio.<br>
+      El acceso al sistema (login) se habilita en el Sprint 2.
+    </div>
+    <p class="pie">Proyecto academico - Revision de Proyectos Procesuales</p>
+  </main>
+</body>
+</html>
