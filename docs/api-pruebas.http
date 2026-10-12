@@ -1,0 +1,11 @@
+### Sprint 1 - Nucleo MVC y base de datos
+# URL base de la API (ajustar el puerto si Apache no escucha en 80)
+@base = http://localhost:8080/sagrado-corazon/api
+
+### Comprobacion del servicio y de la conexion unica (Singleton)
+GET {{base}}/salud
+Accept: application/json
+
+### Ruta inexistente -> 404
+GET {{base}}/no-existe
+Accept: application/json

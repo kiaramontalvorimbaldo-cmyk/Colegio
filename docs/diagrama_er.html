@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Diagrama ER - sagrado_corazon</title>
+<style>
+  :root{--azul:#16305c;--linea:#7f9bc4;--pk:#f0b429}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Segoe UI",Arial,sans-serif;background:#fff;color:#1f2937;padding:24px}
+  h1{font-size:20px;color:var(--azul);margin-bottom:2px}
+  .sub{font-size:12px;color:#6b7280;margin-bottom:18px}
+  .rejilla{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
+  .tabla{border:1.5px solid var(--azul);border-radius:6px;overflow:hidden;break-inside:avoid}
+  .tabla h2{background:var(--azul);color:#fff;font-size:13px;padding:6px 9px;font-weight:600}
+  .tabla ul{list-style:none;padding:5px 8px;font-size:11px;font-family:Consolas,monospace;line-height:1.55}
+  .pk{color:#b45309;font-weight:700}
+  .fk{color:#1d4ed8;font-weight:600}
+  .uq{color:#047857;font-weight:600}
+  .leyenda{margin-top:16px;font-size:11px;display:flex;gap:18px;flex-wrap:wrap}
+  .relaciones{margin-top:10px;font-size:11px;color:#374151;line-height:1.7;max-width:1400px}
+  .relaciones b{color:var(--azul)}
+</style>
+</head>
+<body>
+  <h1>Diagrama entidad-relacion - sagrado_corazon</h1>
+  <p class="sub">Sistema de Administracion Academica - I.E.P. Sagrado Corazon de Jesus &middot; 14 tablas &middot; InnoDB / utf8mb4</p>
+
+  <div class="rejilla">
+    <div class="tabla"><h2>roles</h2><ul>
+      <li><span class="pk">PK id</span></li><li><span class="uq">UQ nombre</span></li><li>descripcion</li></ul></div>
+
+    <div class="tabla"><h2>usuarios</h2><ul>
+      <li><span class="pk">PK id</span></li><li><span class="fk">FK rol_id</span> &rarr; roles.id</li>
+      <li><span class="uq">UQ usuario</span></li><li>password_hash</li><li>nombres</li><li>apellidos</li>
+      <li><span class="uq">UQ email</span></li><li>telefono</li><li>foto</li><li>activo</li><li>creado_en</li></ul></div>
+
+    <div class="tabla"><h2>docentes</h2><ul>
+      <li><span class="pk">PK id</span></li><li><span class="fk">FK usuario_id</span> &rarr; usuarios.id</li>
+      <li><span class="uq">UQ dni</span></li><li>especialidad</li><li>sueldo</li></ul></div>
+
+    <div class="tabla"><h2>estudiantes</h2><ul>
+      <li><span class="pk">PK id</span></li><li><span class="uq">UQ dni</span></li><li>nombres</li>
+      <li>apellidos</li><li>grado</li><li>seccion</li></ul></div>
+
+    <div class="tabla"><h2>cursos</h2><ul>
+      <li><span class="pk">PK id</span></li><li><span class="fk">FK docente_id</span> &rarr; docentes.id</li>
+      <li>nombre</li><li>grado</li><li>seccion</li><li>periodo</li>
+      <li><span class="uq">UQ(nombre,grado,seccion,periodo)</span></li></ul></div>
+
+    <div class="tabla"><h2>horarios</h2><ul>
+      <li><span class="pk">PK id</span></li><li><span class="fk">FK curso_id</span> &rarr; cursos.id</li>
+      <li>dia (1=lun ... 7=dom)</li><li>hora_inicio</li><li>hora_fin</li><li>aula</li></ul></div>
+
+    <div class="tabla"><h2>asistencias</h2><ul>
+      <li><span class="pk">PK id</span></li><li><span class="fk">FK curso_id</span> &rarr; cursos.id</li>
+      <li><span class="fk">FK estudiante_id</span> &rarr; estudiantes.id</li><li>fecha</li>
+      <li>estado (presente|tardanza|falta|justificada)</li><li><span class="fk">FK registrado_por</span> &rarr; usuarios.id</li>
+      <li><span class="uq">UQ(curso_id,estudiante_id,fecha)</span></li></ul></div>
+
+    <div class="tabla"><h2>incidencias</h2><ul>
+      <li><span class="pk">PK id</span></li><li><span class="fk">FK estudiante_id</span> &rarr; estudiantes.id</li>
+      <li><span class="fk">FK docente_id</span> &rarr; docentes.id</li><li>tipo</li><li>descripcion</li>
+      <li>fecha</li><li>estado (pendiente|en_proceso|resuelta)</li><li>respuesta_director</li><li>fecha_respuesta</li></ul></div>
+
+    <div class="tabla"><h2>evaluaciones_docentes</h2><ul>
+      <li><span class="pk">PK id</span></li><li><span class="fk">FK docente_id</span> &rarr; docentes.id</li>
+      <li><span class="fk">FK director_id</span> &rarr; usuarios.id</li><li>puntaje (1..5)</li>
+      <li>observaciones</li><li>fecha</li></ul></div>
+
+    <div class="tabla"><h2>ugel_contactos</h2><ul>
+      <li><span class="pk">PK id</span></li><li>nombre</li><li>cargo</li><li><span class="uq">UQ email</span></li>
+      <li>telefono</li><li>direccion</li></ul></div>
+
+    <div class="tabla"><h2>mensajes</h2><ul>
+      <li><span class="pk">PK id</span></li><li><span class="fk">FK remitente_id</span> &rarr; usuarios.id</li>
+      <li><span class="fk">FK destinatario_id</span> &rarr; usuarios.id</li>
+      <li><span class="fk">FK destinatario_ugel_id</span> &rarr; ugel_contactos.id</li>
+      <li>asunto</li><li>cuerpo</li><li>fecha</li><li>leido</li>
+      <li>CHECK: un solo destinatario</li></ul></div>
+
+    <div class="tabla"><h2>plantillas_ugel</h2><ul>
+      <li><span class="pk">PK id</span></li><li><span class="uq">UQ nombre</span></li><li>contenido_html</li><li>actualizado_en</li></ul></div>
+
+    <div class="tabla"><h2>parametros_economicos</h2><ul>
+      <li><span class="pk">PK id</span></li><li>pension_mensual</li><li>num_estudiantes</li>
+      <li>gastos_operativos</li><li>meses</li><li>actualizado_en</li></ul></div>
+
+    <div class="tabla"><h2>pagos</h2><ul>
+      <li><span class="pk">PK id</span></li><li><span class="fk">FK estudiante_id</span> &rarr; estudiantes.id</li>
+      <li>mes (AAAA-MM)</li><li>monto</li><li>estado (pagado|pendiente)</li>
+      <li><span class="uq">UQ(estudiante_id,mes)</span></li></ul></div>
+  </div>
+
+  <div class="leyenda">
+    <span><span class="pk">PK</span> clave primaria</span>
+    <span><span class="fk">FK</span> clave foranea</span>
+    <span><span class="uq">UQ</span> restriccion unica</span>
+    <span>1:N roles &rarr; usuarios &rarr; docentes &rarr; cursos &rarr; horarios</span>
+    <span>1:N cursos &rarr; asistencias &rarr; estudiantes</span>
+  </div>
+
+  <p class="relaciones">
+    <b>Relaciones principales:</b> roles 1:N usuarios &middot; usuarios 1:1 docentes &middot; docentes 1:N cursos &middot; cursos 1:N horarios &middot;
+    cursos N:N estudiantes (tablaXQ: asistencias) &middot; estudiantes 1:N incidencias &middot; docentes 1:N incidencias &middot;
+    docentes N:N usuarios (tablaXQ: evaluaciones_docentes) &middot; usuarios 1:N mensajes &middot; ugel_contactos 1:N mensajes &middot;
+    estudiantes 1:N pagos.
+  </p>
+</body>
+</html>

@@ -1,0 +1,15 @@
+# URLs limpias de la API: /api/salud -> api/index.php?ruta=salud
+Options -Indexes +FollowSymLinks
+DirectoryIndex index.php index.html
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^api/(.*)$ api/index.php?ruta=$1 [QSA,L]
+</IfModule>
+
+# No servir archivos sensibles del proyecto
+<FilesMatch "\.(sql|md|ini|log|bak)$">
+    Require all denied
+</FilesMatch>

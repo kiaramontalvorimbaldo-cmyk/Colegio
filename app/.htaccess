@@ -1,0 +1,2 @@
+# El nucleo PHP solo se carga desde api/index.php
+Require all denied
