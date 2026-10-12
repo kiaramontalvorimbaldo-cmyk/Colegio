@@ -25,7 +25,6 @@
 body{
   font-family:"Segoe UI",Roboto,Arial,sans-serif;
   background:var(--fondo);color:var(--texto);font-size:15px;line-height:1.5;
-  overflow-x:hidden;
 }
 
 a{text-decoration:none;color:inherit}
@@ -252,6 +251,8 @@ tbody tr:hover{background:#f8fafc}
 /* --------------------------------------------------------- responsive */
 @media (max-width:560px){
   .buscador{display:none}
+  .solo-ancho{display:none}   /* en movil el boton cerrar sesion queda solo con el icono */
+  #btn-salir{padding:9px 11px}
 }
 
 @media (max-width:900px){

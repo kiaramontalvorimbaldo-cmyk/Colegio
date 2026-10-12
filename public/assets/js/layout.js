@@ -90,7 +90,7 @@ function panelHtml(usuario, rol) {
           <strong>${escapar(nombreCompleto(usuario))}</strong>
           <span>${escapar(usuario.rol)}</span>
         </div>
-        <button class="boton secundario" id="btn-salir" title="Cerrar sesion">${svg('salir')} Salir</button>
+        <button class="boton secundario" id="btn-salir" title="Cerrar sesion">${svg('salir')}<span class="solo-ancho">&nbsp;Salir</span></button>
       </div>
     </header>
     <main class="contenido" id="contenido"></main>

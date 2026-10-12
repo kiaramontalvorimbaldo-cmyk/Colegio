@@ -252,3 +252,5 @@ INSERT INTO `usuarios` (`id`, `rol_id`, `usuario`, `password_hash`, `nombres`, `
 INSERT INTO `usuarios` (`id`, `rol_id`, `usuario`, `password_hash`, `nombres`, `apellidos`, `email`, `telefono`, `foto`, `activo`, `creado_en`) VALUES (3,1,'jramirez','$2y$10$XvaNMh4LbsGN5C/.2YXLEebvNAqk.BeFgZKJ6GLdUjomPEWMqvlBO','Lucia','Ramirez Diaz','lramirez@sagradocorazon.edu.pe','900222444',NULL,1,'2026-10-12 00:01:05');
 INSERT INTO `usuarios` (`id`, `rol_id`, `usuario`, `password_hash`, `nombres`, `apellidos`, `email`, `telefono`, `foto`, `activo`, `creado_en`) VALUES (4,1,'mflores','$2y$10$XvaNMh4LbsGN5C/.2YXLEebvNAqk.BeFgZKJ6GLdUjomPEWMqvlBO','Jorge','Flores Aguilar','jflores@sagradocorazon.edu.pe','900222555',NULL,1,'2026-10-12 00:01:05');
 INSERT INTO `usuarios` (`id`, `rol_id`, `usuario`, `password_hash`, `nombres`, `apellidos`, `email`, `telefono`, `foto`, `activo`, `creado_en`) VALUES (5,1,'ralvarado52','$2y$10$1G8Lsn6a6ORCatD6BpjPA.hoZXQzS5XgDVCDWYbMuX5DFO.hHZvMO','Rosa','Alvarado Medina','ralvarado@sagradocorazon.edu.pe','900555666',NULL,1,'2026-10-12 00:33:54');
+
+SET FOREIGN_KEY_CHECKS = 1;
