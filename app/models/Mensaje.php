@@ -35,4 +35,12 @@ final class Mensaje extends ModeloBase
         $stmt->execute(['id' => $usuarioId]);
         return $stmt->fetchAll();
     }
+
+    /** Contactos de la UGEL destinatarios de mensajes. */
+    public function ugelContactos(): array
+    {
+        return $this->pdo()
+            ->query('SELECT id, nombre, cargo, email, telefono FROM ugel_contactos ORDER BY nombre')
+            ->fetchAll();
+    }
 }

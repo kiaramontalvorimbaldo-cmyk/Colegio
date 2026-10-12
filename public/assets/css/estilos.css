@@ -230,6 +230,24 @@ tbody tr:hover{background:#f8fafc}
 .modal h3{margin-bottom:14px;color:var(--azul)}
 .modal-acciones{display:flex;justify-content:flex-end;gap:10px;margin-top:16px}
 
+/* ------------------------------------------ documento imprimible */
+.documento{
+  background:#fff;border:1px solid var(--borde);border-radius:8px;padding:34px;
+  line-height:1.6;font-size:.94rem;color:#111;
+}
+.documento h2{text-align:center;margin-bottom:16px;font-size:1.1rem}
+.documento p{margin-bottom:10px}
+
+@media print{
+  body{background:#fff}
+  .lateral,.cabecera,.no-imprimir,.pestanas{display:none !important}
+  .principal{margin-left:0}
+  .contenido{padding:0}
+  .tarjeta{border:0;box-shadow:none;padding:0}
+  .documento{border:0;padding:0}
+  @page{margin:2cm}
+}
+
 /* --------------------------------------------------------- responsive */
 @media (max-width:900px){
   .app{flex-direction:column}

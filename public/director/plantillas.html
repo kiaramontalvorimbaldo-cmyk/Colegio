@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plantillas UGEL - Direccion</title>
+<link rel="stylesheet" href="../assets/css/estilos.css">
+</head>
+<body>
+<div class="app" id="app"></div>
+
+<script type="module">
+import { iniciarPanel } from '../assets/js/layout.js';
+import { api } from '../assets/js/api.js';
+import { escapar, mostrarAlerta } from '../assets/js/ui.js';
+
+iniciarPanel('DIRECTOR', async (contenedor) => {
+  const rp = await api('plantillas');
+
+  contenedor.innerHTML = `
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+      <h3 style="margin-right:auto">Documentos para la UGEL</h3>
+      <button class="boton secundario no-imprimir" id="imprimir">Imprimir / Guardar como PDF</button>
+    </div>
+    <div class="alerta" id="alerta"></div>
+
+    <div class="fila-filtros no-imprimir">
+      <div class="campo">
+        <label for="plantilla">Plantilla</label>
+        <select id="plantilla">
+          ${(rp.datos ?? []).map((p) => `<option value="${p.id}">${escapar(p.nombre)}</option>`).join('')}
+        </select>
+      </div>
+      <button class="boton" id="generar">Generar documento</button>
+    </div>
+
+    <div class="documento" id="documento">
+      <p class="vacio">Seleccione una plantilla y pulse "Generar documento".</p>
+    </div>`;
+
+  const alerta = document.getElementById('alerta');
+  const area = document.getElementById('documento');
+
+  async function generar() {
+    mostrarAlerta(alerta, '');
+    const id = document.getElementById('plantilla').value;
+    const r = await api(`plantillas/${id}/generar`);
+
+    if (!r.ok) { mostrarAlerta(alerta, r.mensaje); return; }
+
+    area.innerHTML = r.datos.contenido_html;
+    area.dataset.institucion = r.datos.datos_institucionales.institucion;
+
+    const pendientes = r.datos.marcadores_pendientes;
+    mostrarAlerta(
+      alerta,
+      pendientes.length
+        ? `Documento generado. Marcadores sin reemplazo: ${pendientes.join(', ')}`
+        : `${r.datos.nombre}: datos institucionales ya cargados.`,
+      pendientes.length ? 'error' : 'ok'
+    );
+  }
+
+  document.getElementById('generar').addEventListener('click', generar);
+  document.getElementById('imprimir').addEventListener('click', () => window.print());
+  document.getElementById('plantilla').addEventListener('change', generar);
+
+  await generar();
+});
+</script>
+</body>
+</html>

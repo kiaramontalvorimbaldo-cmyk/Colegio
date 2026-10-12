@@ -48,9 +48,9 @@ const MENUS = {
     { titulo: 'Cursos', icono: 'cursos', enlace: 'cursos.html' },
     { titulo: 'Horarios', icono: 'horario', enlace: 'horarios.html' },
     { grupo: 'Administracion' },
-    { titulo: 'Mensajes y UGEL', icono: 'ugel', sprint: 'Sprint 6' },
-    { titulo: 'Plantillas UGEL', icono: 'plantillas', sprint: 'Sprint 6' },
-    { titulo: 'Panel economico', icono: 'economia', sprint: 'Sprint 6' },
+    { titulo: 'Mensajes y UGEL', icono: 'ugel', enlace: 'mensajes.html' },
+    { titulo: 'Plantillas UGEL', icono: 'plantillas', enlace: 'plantillas.html' },
+    { titulo: 'Panel economico', icono: 'economia', enlace: 'economia.html' },
   ],
 };
 

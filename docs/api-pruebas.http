@@ -293,3 +293,66 @@ Content-Type: application/json
 
 ### Eliminar horario -> 200
 DELETE {{base}}/horarios/11
+
+### ---------------- DIRECCION: UGEL, PLANTILLAS Y ECONOMIA (Sprint 6) ----------------
+
+### Contactos de la UGEL -> 200
+GET {{base}}/ugel/contactos
+Accept: application/json
+
+### Mensaje del director a un docente -> 201
+POST {{base}}/mensajes
+Content-Type: application/json
+
+{
+  "tipo_destino": "usuario",
+  "destinatario_id": 3,
+  "asunto": "Felicitacion por su evaluacion",
+  "cuerpo": "Su manejo de Lengua y Comunicacion fue destacado durante este bimestre."
+}
+
+### Mensaje del director a la UGEL -> 201
+POST {{base}}/mensajes
+Content-Type: application/json
+
+{
+  "tipo_destino": "ugel",
+  "destinatario_ugel_id": 1,
+  "asunto": "Informe academico 2026-1",
+  "cuerpo": "Adjuntamos el informe de gestion academica del periodo 2026-1."
+}
+
+### Bandeja completa (recibidos y enviados) -> 200
+GET {{base}}/mensajes?carpeta=todos
+Accept: application/json
+
+### Plantillas UGEL disponibles -> 200
+GET {{base}}/plantillas
+Accept: application/json
+
+### Documento generado con los datos institucionales ya puestos -> 200
+GET {{base}}/plantillas/1/generar
+Accept: application/json
+
+### Indicadores economicos -> 200
+GET {{base}}/economia/resumen
+Accept: application/json
+
+### Cambiar pension, estudiantes y gastos: recalcula todo -> 200
+PUT {{base}}/economia/parametros
+Content-Type: application/json
+
+{
+  "pension_mensual": 420,
+  "num_estudiantes": 32,
+  "gastos_operativos": 5000,
+  "meses": 5
+}
+
+### Meses fuera de rango -> 400
+PUT {{base}}/economia/parametros
+Content-Type: application/json
+
+{
+  "meses": 15
+}

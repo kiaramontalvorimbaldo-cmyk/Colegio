@@ -21,15 +21,14 @@ final class MensajeController
         Respuesta::json(['mensajes' => $mensajes, 'no_leidos' => $noLeidos], 'Bandeja de mensajes');
     }
 
-    /** POST /api/mensajes - el docente redacta hacia la direccion. */
+    /** POST /api/mensajes - docente hacia la direccion; director hacia docentes o UGEL. */
     public function crear(): never
     {
-        Auth::exigirRol('DOCENTE');
+        Auth::exigirRol('DOCENTE', 'DIRECTOR');
 
         $datos = $this->entrada();
         $asunto = trim((string)($datos['asunto'] ?? ''));
         $cuerpo = trim((string)($datos['cuerpo'] ?? ''));
-        $destinatarioId = (int)($datos['destinatario_id'] ?? 0);
 
         if ($asunto === '' || $cuerpo === '') {
             Respuesta::error('El asunto y el cuerpo del mensaje son obligatorios', 400);
@@ -38,25 +37,62 @@ final class MensajeController
             Respuesta::error('El asunto admite 120 y el cuerpo 2000 caracteres', 400);
         }
 
-        // El docente solo puede escribir a la direccion activa.
+        $destino = Auth::esDirector() ? $this->destinoDirector($datos) : $this->destinoDocente($datos);
+
+        $modelo = new Mensaje();
+        $id = $modelo->crear([
+            'remitente_id' => Auth::id(),
+            'asunto'       => $asunto,
+            'cuerpo'       => $cuerpo,
+        ] + $destino);
+
+        Respuesta::creado($modelo->porId($id), 'Mensaje enviado');
+    }
+
+    /** GET /api/ugel/contactos */
+    public function contactos(): never
+    {
+        Auth::exigirRol('DIRECTOR');
+        Respuesta::json((new Mensaje())->ugelContactos(), 'Contactos de la UGEL');
+    }
+
+    /** El docente escribe solo a la direccion activa. */
+    private function destinoDocente(array $datos): array
+    {
         $direccion = (new Usuario())->porRol('DIRECTOR');
         if ($direccion === []) {
             Respuesta::error('No hay una direccion activa registrada', 400);
         }
+
         $destino = (int)$direccion[0]['id'];
-        if ($destinatarioId > 0 && $destinatarioId !== $destino) {
+        $solicitado = (int)($datos['destinatario_id'] ?? 0);
+        if ($solicitado > 0 && $solicitado !== $destino) {
             Respuesta::error('El docente solo puede enviar mensajes a la direccion', 403);
         }
 
-        $modelo = new Mensaje();
-        $id = $modelo->crear([
-            'remitente_id'    => Auth::id(),
-            'destinatario_id' => $destino,
-            'asunto'          => $asunto,
-            'cuerpo'          => $cuerpo,
-        ]);
+        return ['destinatario_id' => $destino];
+    }
 
-        Respuesta::creado($modelo->porId($id), 'Mensaje enviado a la direccion');
+    /** El director elige entre un docente o un contacto de la UGEL. */
+    private function destinoDirector(array $datos): array
+    {
+        $tipo = (string)($datos['tipo_destino'] ?? 'usuario');
+
+        if ($tipo === 'ugel') {
+            $ugelId = (int)($datos['destinatario_ugel_id'] ?? 0);
+            $stmt = Conexion::obtener()->prepare('SELECT COUNT(*) FROM ugel_contactos WHERE id = ?');
+            $stmt->execute([$ugelId]);
+            if ($ugelId <= 0 || (int)$stmt->fetchColumn() === 0) {
+                Respuesta::error('Debe seleccionar un contacto de la UGEL', 400);
+            }
+            return ['destinatario_ugel_id' => $ugelId];
+        }
+
+        $docenteId = (int)($datos['destinatario_id'] ?? 0);
+        if ((new Docente())->porId($docenteId) === null) {
+            Respuesta::error('Debe seleccionar un docente valido', 400);
+        }
+        return ['destinatario_id' => $docenteId];
     }
 
     private function entrada(): array

@@ -27,6 +27,7 @@ export function graficoBarras(idCanvas, etiquetas, datos, opciones = {}) {
     },
     options: {
       responsive: true,
+      maintainAspectRatio: false,
       plugins: {
         legend: { display: false },
         tooltip: { callbacks: { label: (c) => `${c.parsed.y}${opciones.sufijo ?? '%'}` } },
@@ -58,6 +59,7 @@ export function graficoAnillo(idCanvas, etiquetas, datos, colores = [AMBAR, AZUL
     },
     options: {
       responsive: true,
+      maintainAspectRatio: false,
       plugins: { legend: { position: 'right', labels: { font: { size: 12 } } } },
     },
   });

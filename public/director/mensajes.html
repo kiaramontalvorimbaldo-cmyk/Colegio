@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mensajes y UGEL - Direccion</title>
+<link rel="stylesheet" href="../assets/css/estilos.css">
+</head>
+<body>
+<div class="app" id="app"></div>
+
+<script type="module">
+import { iniciarPanel } from '../assets/js/layout.js';
+import { api } from '../assets/js/api.js';
+import { pintarTabla, badge } from '../assets/js/tabla.js';
+import { escapar, formatoFecha, mostrarAlerta } from '../assets/js/ui.js';
+
+iniciarPanel('DIRECTOR', async (contenedor) => {
+  const [rd, ru] = await Promise.all([api('docentes'), api('ugel/contactos')]);
+
+  contenedor.innerHTML = `
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+      <h3 style="margin-right:auto">Mensajes con docentes y UGEL</h3>
+      <button class="boton" id="redactar">Redactar mensaje</button>
+    </div>
+    <div class="alerta" id="alerta"></div>
+
+    <div class="pestanas">
+      <button class="activo" data-carpeta="recibidos">Recibidos <span id="no-leidos"></span></button>
+      <button data-carpeta="enviados">Enviados</button>
+    </div>
+    <div id="tabla"></div>
+
+    <div class="overlay" id="overlay">
+      <div class="modal">
+        <h3>Nuevo mensaje</h3>
+        <div class="alerta" id="alerta-modal"></div>
+        <form id="formulario">
+          <div class="campo"><label for="tipo_destino">Destinatario</label>
+            <select id="tipo_destino">
+              <option value="usuario">Docente</option>
+              <option value="ugel">UGEL</option>
+            </select></div>
+
+          <div class="campo" id="grupo-docente">
+            <label for="docente">Docente</label>
+            <select id="docente">
+              ${(rd.datos ?? []).map((d) => `<option value="${d.id}">${escapar(d.apellidos)}, ${escapar(d.nombres)}</option>`).join('')}
+            </select></div>
+
+          <div class="campo escondido" id="grupo-ugel">
+            <label for="ugel">Contacto de la UGEL</label>
+            <select id="ugel">
+              ${(ru.datos ?? []).map((u) => `<option value="${u.id}">${escapar(u.nombre)} - ${escapar(u.email)}</option>`).join('')}
+            </select></div>
+
+          <div class="campo"><label for="asunto">Asunto</label>
+            <input type="text" id="asunto" maxlength="120" required></div>
+          <div class="campo"><label for="cuerpo">Mensaje</label>
+            <textarea id="cuerpo" rows="5" maxlength="2000" required></textarea></div>
+
+          <div class="modal-acciones">
+            <button type="button" class="boton secundario" id="cancelar">Cancelar</button>
+            <button type="submit" class="boton">Enviar</button>
+          </div>
+        </form>
+      </div>
+    </div>`;
+
+  const tabla = document.getElementById('tabla');
+  const alerta = document.getElementById('alerta');
+  const overlay = document.getElementById('overlay');
+
+  const columnas = [
+    { titulo: 'De / Para', render: (m) => {
+        const de = `${m.remitente_nombres} ${m.remitente_apellidos}`;
+        const para = m.destinatario_ugel ?? `${m.destinatario_nombres ?? ''} ${m.destinatario_apellidos ?? ''}`;
+        return `<strong>${escapar(de.trim())}</strong><br><small style="color:var(--gris)">${escapar(para.trim())}</small>`;
+      } },
+    { titulo: 'Asunto y mensaje', render: (m) => `<strong>${escapar(m.asunto)}</strong><br>
+        <small style="color:var(--gris)">${escapar(String(m.cuerpo).slice(0, 80))}${m.cuerpo.length > 80 ? '...' : ''}</small>` },
+    { titulo: 'Destino', render: (m) => m.destinatario_ugel ? badge('UGEL', 'azul') : badge('Docente', 'verde') },
+    { titulo: 'Fecha', render: (m) => formatoFecha(m.fecha) },
+    { titulo: 'Estado', render: (m) => Number(m.leido) === 0 ? badge('No leido', 'ambar') : badge('Leido', 'verde') },
+  ];
+
+  async function cargar(carpeta) {
+    const r = await api('mensajes', { params: { carpeta } });
+    if (!r.ok) { tabla.innerHTML = `<div class="alerta visible error">${escapar(r.mensaje)}</div>`; return; }
+
+    document.getElementById('no-leidos').textContent =
+      carpeta === 'recibidos' && r.datos.no_leidos ? `(${r.datos.no_leidos})` : '';
+
+    pintarTabla(tabla, columnas, r.datos.mensajes,
+      carpeta === 'recibidos' ? 'No hay mensajes recibidos' : 'No se han enviado mensajes todavia');
+  }
+
+  document.querySelectorAll('.pestanas button').forEach((boton) => {
+    boton.addEventListener('click', () => {
+      document.querySelectorAll('.pestanas button').forEach((b) => b.classList.remove('activo'));
+      boton.classList.add('activo');
+      cargar(boton.dataset.carpeta);
+    });
+  });
+
+  document.getElementById('tipo_destino').addEventListener('change', (e) => {
+    const esDocente = e.target.value === 'usuario';
+    document.getElementById('grupo-docente').classList.toggle('escondido', !esDocente);
+    document.getElementById('grupo-ugel').classList.toggle('escondido', esDocente);
+  });
+
+  document.getElementById('redactar').addEventListener('click', () => {
+    mostrarAlerta(document.getElementById('alerta-modal'), '');
+    overlay.classList.add('visible');
+  });
+  document.getElementById('cancelar').addEventListener('click', () => overlay.classList.remove('visible'));
+
+  document.getElementById('formulario').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const tipo = document.getElementById('tipo_destino').value;
+
+    const r = await api('mensajes', {
+      metodo: 'POST',
+      cuerpo: {
+        tipo_destino: tipo,
+        destinatario_id: Number(document.getElementById('docente').value),
+        destinatario_ugel_id: Number(document.getElementById('ugel').value),
+        asunto: document.getElementById('asunto').value.trim(),
+        cuerpo: document.getElementById('cuerpo').value.trim(),
+      },
+    });
+
+    if (!r.ok) { mostrarAlerta(document.getElementById('alerta-modal'), r.mensaje); return; }
+
+    overlay.classList.remove('visible');
+    e.target.reset();
+    mostrarAlerta(alerta, r.mensaje, 'ok');
+    document.querySelector('.pestanas button[data-carpeta="enviados"]').click();
+  });
+
+  await cargar('recibidos');
+});
+</script>
+</body>
+</html>

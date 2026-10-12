@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel economico - Direccion</title>
+<link rel="stylesheet" href="../assets/css/estilos.css">
+</head>
+<body>
+<div class="app" id="app"></div>
+<script src="../assets/js/chart.umd.min.js"></script>
+
+<script type="module">
+import { iniciarPanel, svg } from '../assets/js/layout.js';
+import { api } from '../assets/js/api.js';
+import { graficoBarras, graficoAnillo } from '../assets/js/graficos.js';
+import { escapar, formatoDinero, mostrarAlerta } from '../assets/js/ui.js';
+
+iniciarPanel('DIRECTOR', async (contenedor) => {
+  contenedor.innerHTML = '<div class="tarjeta"><p class="vacio">Cargando indicadores economicos...</p></div>';
+
+  let graficos = [];
+
+  async function cargar() {
+    const r = await api('economia/resumen');
+    if (!r.ok) { contenedor.innerHTML = `<div class="alerta visible error">${escapar(r.mensaje)}</div>`; return; }
+
+    const d = r.datos;
+    const p = d.parametros;
+
+    contenedor.innerHTML = `
+      <h3 style="margin-bottom:14px">Panel economico</h3>
+      <div class="alerta" id="alerta"></div>
+
+      <div class="rejilla" style="margin-bottom:16px">
+        <div class="indicador tarjeta">
+          <div class="icono">${svg('economia')}</div>
+          <div><div class="valor">${formatoDinero(d.teorica)}</div><div class="etiqueta">Recaudacion teorica</div></div>
+        </div>
+        <div class="indicador tarjeta">
+          <div class="icono">${svg('asistencia')}</div>
+          <div><div class="valor">${formatoDinero(d.efectiva)}</div><div class="etiqueta">Recaudacion efectiva</div></div>
+        </div>
+        <div class="indicador tarjeta">
+          <div class="icono">${svg('incidencias')}</div>
+          <div><div class="valor">${d.morosidad_pct}%</div><div class="etiqueta">Morosidad</div></div>
+        </div>
+        <div class="indicador tarjeta">
+          <div class="icono">${svg('reporte')}</div>
+          <div><div class="valor">${formatoDinero(d.balance_neto)}</div><div class="etiqueta">Balance neto</div></div>
+        </div>
+      </div>
+
+      <div class="rejilla dos" style="margin-bottom:16px">
+        <div class="tarjeta">
+          <h3>Recaudacion teorica vs. efectiva</h3>
+          <p>Por mes del periodo: cobrado frente a pendiente.</p>
+          <div class="grafico"><canvas id="grafico-recaudacion"></canvas></div>
+        </div>
+        <div class="tarjeta">
+          <h3>Composicion de la recaudacion</h3>
+          <p>Efectiva ${formatoDinero(d.efectiva)} · pendiente ${formatoDinero(d.pendiente)}</p>
+          <div class="grafico"><canvas id="grafico-morosidad"></canvas></div>
+        </div>
+      </div>
+
+      <div class="rejilla dos">
+        <div class="tarjeta">
+          <h3>Parametros economicos</h3>
+          <p>Al guardar, los indicadores y graficos se recalculan.</p>
+          <form id="formulario">
+            <div class="campo"><label for="pension_mensual">Pension mensual (S/)</label>
+              <input type="number" id="pension_mensual" step="0.01" min="1" value="${p.pension_mensual}"></div>
+            <div class="campo"><label for="num_estudiantes">Numero de estudiantes</label>
+              <input type="number" id="num_estudiantes" step="1" min="0" value="${p.num_estudiantes}"></div>
+            <div class="campo"><label for="gastos_operativos">Gastos operativos (S/)</label>
+              <input type="number" id="gastos_operativos" step="0.01" min="0" value="${p.gastos_operativos}"></div>
+            <div class="campo"><label for="meses">Meses del periodo</label>
+              <input type="number" id="meses" step="1" min="1" max="12" value="${p.meses}"></div>
+            <button class="boton" type="submit">Actualizar parametros</button>
+          </form>
+        </div>
+
+        <div class="tarjeta">
+          <h3>Balance y punto de equilibrio</h3>
+          <div class="datos-fijos" style="margin-bottom:14px">
+            <div class="dato"><span>Planilla mensual</span><strong>${formatoDinero(d.planilla)}</strong></div>
+            <div class="dato"><span>Gastos operativos</span><strong>${formatoDinero(d.gastos_operativos)}</strong></div>
+            <div class="dato"><span>Balance neto</span><strong>${formatoDinero(d.balance_neto)}</strong></div>
+            <div class="dato"><span>Punto de equilibrio</span><strong>${d.punto_equilibrio} estudiantes</strong></div>
+          </div>
+          <div class="grafico"><canvas id="grafico-equilibrio"></canvas></div>
+          <p style="font-size:.82rem;color:var(--gris);margin-top:8px">
+            ${d.supera_equilibrio
+              ? 'La institucion supera el punto de equilibrio del periodo.'
+              : 'La institucion aun no alcanza el punto de equilibrio del periodo.'}</p>
+        </div>
+      </div>`;
+
+    graficos.forEach((g) => g.destroy());
+    graficos = [];
+
+    const etiquetas = d.pagos_mes.map((m) => m.mes);
+    graficos.push(graficoBarras('grafico-recaudacion', etiquetas,
+      d.pagos_mes.map((m) => Number(m.efectiva)),
+      { etiqueta: 'Cobrado', color: '#16a34a', conteos: true }));
+
+    graficos.push(graficoAnillo('grafico-morosidad',
+      ['Efectiva', 'Pendiente'], [d.efectiva, d.pendiente], ['#16a34a', '#dc2626']));
+
+    graficos.push(graficoBarras('grafico-equilibrio',
+      ['Estudiantes actuales', 'Punto de equilibrio'],
+      [p.num_estudiantes, d.punto_equilibrio],
+      { etiqueta: 'Estudiantes', conteos: true }));
+  }
+
+  contenedor.addEventListener('submit', async (e) => {
+    if (e.target.id !== 'formulario') return;
+    e.preventDefault();
+
+    const r = await api('economia/parametros', {
+      metodo: 'PUT',
+      cuerpo: {
+        pension_mensual: document.getElementById('pension_mensual').value,
+        num_estudiantes: document.getElementById('num_estudiantes').value,
+        gastos_operativos: document.getElementById('gastos_operativos').value,
+        meses: document.getElementById('meses').value,
+      },
+    });
+
+    mostrarAlerta(document.getElementById('alerta'), r.mensaje, r.ok ? 'ok' : 'error');
+    if (r.ok) await cargar();
+  });
+
+  await cargar();
+});
+</script>
+</body>
+</html>

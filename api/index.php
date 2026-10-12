@@ -85,5 +85,12 @@ $router->agregar('DELETE', 'horarios/{id}',    HorarioController::class,   'borr
 
 // Mensajeria entre docentes y direccion
 $router->agregar('GET',  'mensajes', MensajeController::class, 'index',  ['DOCENTE', 'DIRECTOR']);
-$router->agregar('POST', 'mensajes', MensajeController::class, 'crear',  ['DOCENTE']);
+$router->agregar('POST', 'mensajes', MensajeController::class, 'crear',  ['DOCENTE', 'DIRECTOR']);
+
+// Mensajeria con la UGEL, plantillas y gestion economica (Sprint 6)
+$router->agregar('GET', 'ugel/contactos',          MensajeController::class,   'contactos',   ['DIRECTOR']);
+$router->agregar('GET', 'plantillas',              PlantillaController::class, 'index',       ['DIRECTOR']);
+$router->agregar('GET', 'plantillas/{id}/generar', PlantillaController::class, 'generar',     ['DIRECTOR']);
+$router->agregar('GET', 'economia/resumen',        EconomiaController::class,  'resumen',     ['DIRECTOR']);
+$router->agregar('PUT', 'economia/parametros',     EconomiaController::class,  'parametros',  ['DIRECTOR']);
 $router->despachar();
