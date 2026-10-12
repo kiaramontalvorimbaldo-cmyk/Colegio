@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mensajes - Docencia</title>
+<link rel="stylesheet" href="../assets/css/estilos.css">
+</head>
+<body>
+<div class="app" id="app"></div>
+
+<script type="module">
+import { iniciarPanel } from '../assets/js/layout.js';
+import { api } from '../assets/js/api.js';
+import { pintarTabla, badge } from '../assets/js/tabla.js';
+import { escapar, formatoFecha, mostrarAlerta } from '../assets/js/ui.js';
+
+iniciarPanel('DOCENTE', async (contenedor) => {
+  contenedor.innerHTML = `
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+      <h3 style="margin-right:auto">Bandeja de mensajes</h3>
+      <button class="boton" id="redactar">Redactar mensaje</button>
+    </div>
+
+    <div class="pestanas">
+      <button class="activo" data-carpeta="recibidos">Recibidos <span id="no-leidos"></span></button>
+      <button data-carpeta="enviados">Enviados</button>
+    </div>
+
+    <div id="tabla"></div>
+
+    <div class="overlay" id="overlay">
+      <div class="modal">
+        <h3>Nuevo mensaje a la direccion</h3>
+        <div class="alerta" id="alerta"></div>
+        <form id="formulario">
+          <div class="campo"><label for="asunto">Asunto</label>
+            <input type="text" id="asunto" maxlength="120" placeholder="Ej. Solicitud de material didactico" required></div>
+          <div class="campo"><label for="cuerpo">Mensaje</label>
+            <textarea id="cuerpo" rows="5" maxlength="2000" placeholder="Escriba su mensaje" required></textarea></div>
+          <div class="modal-acciones">
+            <button type="button" class="boton secundario" id="cancelar">Cancelar</button>
+            <button type="submit" class="boton">Enviar</button>
+          </div>
+        </form>
+      </div>
+    </div>`;
+
+  const overlay = document.getElementById('overlay');
+  const tabla = document.getElementById('tabla');
+  const alerta = document.getElementById('alerta');
+
+  const columnas = [
+    { titulo: 'De / Para', render: (m) => {
+        const nombre = `${m.remitente_nombres} ${m.remitente_apellidos}`;
+        const otro = m.destinatario_ugel ?? `${m.destinatario_nombres ?? ''} ${m.destinatario_apellidos ?? ''}`;
+        return `<strong>${escapar(nombre.trim())}</strong><br><small style="color:var(--gris)">${escapar(otro.trim())}</small>`;
+      } },
+    { titulo: 'Asunto y mensaje', render: (m) => `<strong>${escapar(m.asunto)}</strong><br>
+        <small style="color:var(--gris)">${escapar(String(m.cuerpo).slice(0, 70))}${m.cuerpo.length > 70 ? '...' : ''}</small>` },
+    { titulo: 'Fecha', render: (m) => formatoFecha(m.fecha) },
+    { titulo: 'Estado', render: (m) => Number(m.leido) === 0 ? badge('No leido', 'ambar') : badge('Leido', 'verde') },
+  ];
+
+  async function cargar(carpeta) {
+    const r = await api('mensajes', { params: { carpeta } });
+    if (!r.ok) { tabla.innerHTML = `<div class="alerta visible error">${escapar(r.mensaje)}</div>`; return; }
+
+    document.getElementById('no-leidos').textContent =
+      carpeta === 'recibidos' && r.datos.no_leidos ? `(${r.datos.no_leidos})` : '';
+
+    pintarTabla(tabla, columnas, r.datos.mensajes,
+      carpeta === 'recibidos' ? 'No hay mensajes recibidos' : 'No ha enviado mensajes todavia');
+  }
+
+  document.querySelectorAll('.pestanas button').forEach((boton) => {
+    boton.addEventListener('click', () => {
+      document.querySelectorAll('.pestanas button').forEach((b) => b.classList.remove('activo'));
+      boton.classList.add('activo');
+      cargar(boton.dataset.carpeta);
+    });
+  });
+
+  document.getElementById('redactar').addEventListener('click', () => {
+    mostrarAlerta(alerta, '');
+    overlay.classList.add('visible');
+  });
+  document.getElementById('cancelar').addEventListener('click', () => overlay.classList.remove('visible'));
+
+  document.getElementById('formulario').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const r = await api('mensajes', {
+      metodo: 'POST',
+      cuerpo: {
+        asunto: document.getElementById('asunto').value.trim(),
+        cuerpo: document.getElementById('cuerpo').value.trim(),
+      },
+    });
+
+    if (!r.ok) { mostrarAlerta(alerta, r.mensaje); return; }
+
+    overlay.classList.remove('visible');
+    e.target.reset();
+    document.querySelector('.pestanas button[data-carpeta="enviados"]').click();
+  });
+
+  await cargar('recibidos');
+});
+</script>
+</body>
+</html>

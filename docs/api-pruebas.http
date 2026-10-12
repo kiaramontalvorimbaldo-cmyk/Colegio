@@ -59,3 +59,51 @@ Content-Type: application/json
 ### Docente en ruta de director -> 403
 GET {{base}}/pruebas/permiso-director
 Accept: application/json
+
+### ---------------- DOCENTE (Sprint 3) ----------------
+
+### Perfil del docente (solo el propio) -> 200
+GET {{base}}/docente/perfil
+Accept: application/json
+
+### Editar datos de contacto -> 200
+PUT {{base}}/docente/perfil
+Content-Type: application/json
+
+{
+  "nombres": "Carlos",
+  "apellidos": "Quispe Rojas",
+  "email": "cquispe@sagradocorazon.edu.pe",
+  "telefono": "900 222 333",
+  "foto": null
+}
+
+### Cursos asignados al docente de la sesion -> 200
+GET {{base}}/docente/cursos
+Accept: application/json
+
+### Horario semanal agrupado por dia -> 200
+GET {{base}}/docente/horario
+Accept: application/json
+
+### Bandeja de mensajes recibidos -> 200
+GET {{base}}/mensajes?carpeta=recibidos
+Accept: application/json
+
+### Enviar mensaje a la direccion -> 201
+POST {{base}}/mensajes
+Content-Type: application/json
+
+{
+  "asunto": "Solicitud de material didactico",
+  "cuerpo": "Solicito un proyector adicional para el aula de 5to A."
+}
+
+### Asunto vacio -> 400
+POST {{base}}/mensajes
+Content-Type: application/json
+
+{
+  "asunto": "",
+  "cuerpo": "Mensaje sin asunto"
+}

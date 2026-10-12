@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mis cursos - Docencia</title>
+<link rel="stylesheet" href="../assets/css/estilos.css">
+</head>
+<body>
+<div class="app" id="app"></div>
+
+<script type="module">
+import { iniciarPanel, svg } from '../assets/js/layout.js';
+import { api } from '../assets/js/api.js';
+import { pintarTabla, badge } from '../assets/js/tabla.js';
+import { escapar } from '../assets/js/ui.js';
+
+iniciarPanel('DOCENTE', async (contenedor) => {
+  const r = await api('docente/cursos');
+  if (!r.ok) { contenedor.innerHTML = `<div class="alerta visible error">${escapar(r.mensaje)}</div>`; return; }
+
+  const cursos = r.datos;
+  const horas = cursos.reduce((t, c) => t + Number(c.horas_semana), 0);
+  const alumnos = cursos.reduce((t, c) => t + Number(c.estudiantes), 0);
+
+  contenedor.innerHTML = `
+    <h3 style="margin-bottom:14px">Mis cursos asignados</h3>
+    <div class="rejilla" style="margin-bottom:16px">
+      <div class="indicador tarjeta">
+        <div class="icono">${svg('cursos')}</div>
+        <div><div class="valor">${cursos.length}</div><div class="etiqueta">Cursos a cargo</div></div>
+      </div>
+      <div class="indicador tarjeta">
+        <div class="icono">${svg('horario')}</div>
+        <div><div class="valor">${horas}</div><div class="etiqueta">Horas semanales</div></div>
+      </div>
+      <div class="indicador tarjeta">
+        <div class="icono">${svg('docentes')}</div>
+        <div><div class="valor">${alumnos}</div><div class="etiqueta">Estudiantes</div></div>
+      </div>
+    </div>
+    <div id="tabla"></div>`;
+
+  pintarTabla(document.getElementById('tabla'), [
+    { titulo: 'Curso', render: (c) => `<strong>${escapar(c.nombre)}</strong>` },
+    { titulo: 'Grado', render: (c) => `${escapar(c.grado)} - ${escapar(c.seccion)}` },
+    { titulo: 'Periodo', clave: 'periodo' },
+    { titulo: 'Horas/semana', render: (c) => badge(c.horas_semana + ' h', 'azul') },
+    { titulo: 'Estudiantes', clave: 'estudiantes' },
+  ], cursos, 'No tiene cursos asignados');
+});
+</script>
+</body>
+</html>

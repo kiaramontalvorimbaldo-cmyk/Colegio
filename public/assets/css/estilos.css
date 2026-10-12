@@ -176,6 +176,54 @@ tbody tr:hover{background:#f8fafc}
 .vacio{text-align:center;color:var(--gris);padding:26px;font-size:.88rem}
 .escondido{display:none}
 
+/* -------------------------------------------------- ficha y foto */
+.foto-caja{display:flex;align-items:center;gap:18px;margin-bottom:18px;flex-wrap:wrap}
+.foto-grande{
+  width:96px;height:96px;border-radius:50%;background:#eef3fb;color:var(--azul-claro);
+  display:flex;align-items:center;justify-content:center;font-size:1.7rem;font-weight:700;
+  overflow:hidden;border:2px solid var(--blanco);box-shadow:var(--sombra);
+}
+.foto-grande img{width:100%;height:100%;object-fit:cover}
+.foto-acciones{display:flex;flex-direction:column;gap:8px}
+.datos-fijos{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-bottom:16px}
+.dato{background:#f8fafc;border:1px solid var(--borde);border-radius:8px;padding:10px 12px}
+.dato span{display:block;font-size:.72rem;color:var(--gris);text-transform:uppercase;letter-spacing:.04em}
+.dato strong{font-size:.92rem}
+
+/* ------------------------------------------------------ pestañas */
+.pestanas{display:flex;gap:8px;margin-bottom:16px;border-bottom:1px solid var(--borde)}
+.pestanas button{
+  background:transparent;border:0;border-bottom:2px solid transparent;cursor:pointer;
+  padding:9px 14px;font-size:.88rem;font-weight:600;color:var(--gris);
+}
+.pestanas button.activo{color:var(--azul);border-bottom-color:var(--azul)}
+
+/* ------------------------------------------------ grilla horaria */
+.grilla-horario{display:grid;grid-template-columns:repeat(7,1fr);gap:10px}
+.grilla-horario .dia{
+  background:var(--azul);color:#fff;text-align:center;padding:7px;border-radius:8px;
+  font-size:.78rem;font-weight:600;
+}
+.grilla-horario .dia.vacio{background:#eef1f6;color:var(--gris)}
+.clase{
+  background:var(--blanco);border:1px solid var(--borde);border-left:3px solid var(--azul-claro);
+  border-radius:8px;padding:9px 10px;margin-bottom:9px;font-size:.78rem;box-shadow:var(--sombra);
+}
+.clase strong{display:block;color:var(--azul);font-size:.8rem;margin-bottom:3px}
+.clase .meta{color:var(--gris);display:block}
+.clase .aula{color:var(--azul-claro);font-weight:600}
+.sin-clases{color:var(--gris);font-size:.76rem;text-align:center;padding:10px 0}
+
+/* ------------------------------------------------------- modal */
+.overlay{
+  position:fixed;inset:0;background:rgba(15,28,51,.55);display:none;
+  align-items:center;justify-content:center;padding:20px;z-index:20;
+}
+.overlay.visible{display:flex}
+.modal{background:var(--blanco);border-radius:12px;width:100%;max-width:520px;padding:22px;box-shadow:0 20px 50px rgba(0,0,0,.3)}
+.modal h3{margin-bottom:14px;color:var(--azul)}
+.modal-acciones{display:flex;justify-content:flex-end;gap:10px;margin-top:16px}
+
 /* --------------------------------------------------------- responsive */
 @media (max-width:900px){
   .app{flex-direction:column}
@@ -187,4 +235,6 @@ tbody tr:hover{background:#f8fafc}
   .principal{margin-left:0}
   .buscador input{width:110px}
   .perfil-datos{display:none}
+  .grilla-horario{grid-template-columns:1fr}
+  .grilla-horario .dia.vacio{display:none}
 }

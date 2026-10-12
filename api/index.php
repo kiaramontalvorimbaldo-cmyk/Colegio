@@ -52,4 +52,14 @@ $router->agregar('GET',  'auth/yo',     AuthController::class, 'yo',       ['DOC
 // Diagnostico del middleware de roles (Sprint 2)
 $router->agregar('GET', 'pruebas/permiso-docente',  RolController::class, 'soloDocente',  ['DOCENTE']);
 $router->agregar('GET', 'pruebas/permiso-director', RolController::class, 'soloDirector', ['DIRECTOR']);
+
+// Modulos del docente (Sprint 3)
+$router->agregar('GET', 'docente/perfil',  DocenteController::class, 'perfil',          ['DOCENTE']);
+$router->agregar('PUT', 'docente/perfil',  DocenteController::class, 'actualizarPerfil', ['DOCENTE']);
+$router->agregar('GET', 'docente/cursos',  DocenteController::class, 'cursos',          ['DOCENTE']);
+$router->agregar('GET', 'docente/horario', DocenteController::class, 'horario',         ['DOCENTE']);
+
+// Mensajeria entre docentes y direccion
+$router->agregar('GET',  'mensajes', MensajeController::class, 'index',  ['DOCENTE', 'DIRECTOR']);
+$router->agregar('POST', 'mensajes', MensajeController::class, 'crear',  ['DOCENTE']);
 $router->despachar();

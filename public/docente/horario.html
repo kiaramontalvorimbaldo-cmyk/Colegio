@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mi horario - Docencia</title>
+<link rel="stylesheet" href="../assets/css/estilos.css">
+</head>
+<body>
+<div class="app" id="app"></div>
+
+<script type="module">
+import { iniciarPanel } from '../assets/js/layout.js';
+import { api } from '../assets/js/api.js';
+import { escapar } from '../assets/js/ui.js';
+
+const DIAS = ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo'];
+
+iniciarPanel('DOCENTE', async (contenedor) => {
+  const r = await api('docente/horario');
+  if (!r.ok) { contenedor.innerHTML = `<div class="alerta visible error">${escapar(r.mensaje)}</div>`; return; }
+
+  const horario = r.datos;
+  let total = 0;
+
+  const columnas = DIAS.map((nombre, indice) => {
+    const clases = horario[String(indice + 1)] ?? [];
+    total += clases.length;
+
+    const tarjetas = clases.map((c) => `
+      <div class="clase">
+        <strong>${escapar(c.curso)}</strong>
+        <span class="meta">${escapar(c.grado)} - ${escapar(c.seccion)}</span>
+        <span class="meta">${escapar(String(c.hora_inicio).slice(0, 5))} - ${escapar(String(c.hora_fin).slice(0, 5))}</span>
+        <span class="aula">Aula ${escapar(c.aula)}</span>
+      </div>`).join('');
+
+    return `
+      <div>
+        <div class="dia ${clases.length ? '' : 'vacio'}">${escapar(nombre)}</div>
+        ${tarjetas || '<p class="sin-clases">Sin clases</p>'}
+      </div>`;
+  }).join('');
+
+  contenedor.innerHTML = `
+    <h3 style="margin-bottom:4px">Mi horario semanal</h3>
+    <p style="color:var(--gris);font-size:.86rem;margin-bottom:14px">
+      ${total} clases programadas en el periodo 2026-1</p>
+    <div class="tarjeta"><div class="grilla-horario">${columnas}</div></div>`;
+});
+</script>
+</body>
+</html>

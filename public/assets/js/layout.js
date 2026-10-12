@@ -29,10 +29,10 @@ const MENUS = {
   DOCENTE: [
     { grupo: 'Principal' },
     { titulo: 'Panel', icono: 'panel', enlace: 'index.html' },
-    { titulo: 'Mi perfil', icono: 'perfil', sprint: 'Sprint 3' },
-    { titulo: 'Mis cursos', icono: 'cursos', sprint: 'Sprint 3' },
-    { titulo: 'Mi horario', icono: 'horario', sprint: 'Sprint 3' },
-    { titulo: 'Mensajes', icono: 'mensajes', sprint: 'Sprint 3' },
+    { titulo: 'Mi perfil', icono: 'perfil', enlace: 'perfil.html' },
+    { titulo: 'Mis cursos', icono: 'cursos', enlace: 'cursos.html' },
+    { titulo: 'Mi horario', icono: 'horario', enlace: 'horario.html' },
+    { titulo: 'Mensajes', icono: 'mensajes', enlace: 'mensajes.html' },
     { grupo: 'Aula' },
     { titulo: 'Asistencia', icono: 'asistencia', sprint: 'Sprint 4' },
     { titulo: 'Incidencias', icono: 'incidencias', sprint: 'Sprint 4' },
@@ -55,10 +55,12 @@ const MENUS = {
 };
 
 function menuHtml(rol) {
+  const actual = location.pathname.split('/').pop() || 'index.html';
+
   return (MENUS[rol] ?? [])
     .map((item) => {
       if (item.grupo) return `<li class="menu-titulo">${escapar(item.grupo)}</li>`;
-      const activo = item.enlace ? ' class="activo"' : '';
+      const activo = item.enlace === actual ? ' class="activo"' : '';
       const etiqueta = item.sprint ? `<span class="sprint">${item.sprint}</span>` : '';
       const destino = item.enlace ?? '#';
       return `<li><a href="${destino}"${activo}>${svg(item.icono)}<span>${escapar(item.titulo)}</span>${etiqueta}</a></li>`;

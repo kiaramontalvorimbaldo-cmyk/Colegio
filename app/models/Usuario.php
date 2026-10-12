@@ -40,4 +40,18 @@ final class Usuario extends ModeloBase
         $fila = $stmt->fetch();
         return $fila === false ? null : $fila;
     }
+
+    /** Usuarios activos de un perfil (por ejemplo la direccion). */
+    public function porRol(string $rol): array
+    {
+        $sql = 'SELECT u.*, r.nombre AS rol
+                FROM usuarios u
+                INNER JOIN roles r ON r.id = u.rol_id
+                WHERE r.nombre = ? AND u.activo = 1
+                ORDER BY u.id';
+
+        $stmt = $this->pdo()->prepare($sql);
+        $stmt->execute([$rol]);
+        return $stmt->fetchAll();
+    }
 }

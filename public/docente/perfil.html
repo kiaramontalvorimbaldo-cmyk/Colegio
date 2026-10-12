@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mi perfil - Docencia</title>
+<link rel="stylesheet" href="../assets/css/estilos.css">
+</head>
+<body>
+<div class="app" id="app"></div>
+
+<script type="module">
+import { iniciarPanel, svg } from '../assets/js/layout.js';
+import { api } from '../assets/js/api.js';
+import { escapar, iniciales, mostrarAlerta } from '../assets/js/ui.js';
+
+iniciarPanel('DOCENTE', async (contenedor) => {
+  const r = await api('docente/perfil');
+  if (!r.ok) { mostrarAlerta(contenedor, r.mensaje); return; }
+
+  const u = r.datos;
+  contenedor.innerHTML = `
+    <h3 style="margin-bottom:14px">Mi perfil</h3>
+    <div class="alerta" id="alerta"></div>
+
+    <div class="tarjeta">
+      <div class="foto-caja">
+        <div class="foto-grande" id="foto">${escapar(iniciales(u.nombres, u.apellidos))}</div>
+        <div class="foto-acciones">
+          <label class="boton secundario" style="cursor:pointer">
+            ${svg('perfil')} Subir foto
+            <input type="file" id="archivo" accept="image/png,image/jpeg,image/webp" hidden>
+          </label>
+          <button class="boton secundario" id="quitar-foto">Quitar foto</button>
+          <small style="color:var(--gris);font-size:.74rem">JPG o PNG, hasta 300 KB</small>
+        </div>
+      </div>
+
+      <div class="datos-fijos">
+        <div class="dato"><span>Usuario</span><strong>${escapar(u.usuario)}</strong></div>
+        <div class="dato"><span>DNI</span><strong>${escapar(u.docente?.dni ?? '-')}</strong></div>
+        <div class="dato"><span>Especialidad</span><strong>${escapar(u.docente?.especialidad ?? '-')}</strong></div>
+        <div class="dato"><span>Perfil</span><strong>${escapar(u.rol)}</strong></div>
+      </div>
+
+      <form id="formulario">
+        <div class="rejilla dos">
+          <div>
+            <div class="campo"><label for="nombres">Nombres</label>
+              <input type="text" id="nombres" value="${escapar(u.nombres)}" required></div>
+            <div class="campo"><label for="email">Correo electronico</label>
+              <input type="email" id="email" value="${escapar(u.email ?? '')}" required></div>
+          </div>
+          <div>
+            <div class="campo"><label for="apellidos">Apellidos</label>
+              <input type="text" id="apellidos" value="${escapar(u.apellidos)}" required></div>
+            <div class="campo"><label for="telefono">Telefono</label>
+              <input type="text" id="telefono" value="${escapar(u.telefono ?? '')}"></div>
+          </div>
+        </div>
+        <button class="boton" type="submit" id="guardar">Guardar cambios</button>
+      </form>
+    </div>`;
+
+  const alerta = document.getElementById('alerta');
+  const foto = document.getElementById('foto');
+  let fotoActual = u.foto ?? null;
+
+  function pintarFoto() {
+    foto.innerHTML = fotoActual
+      ? `<img src="${escapar(fotoActual)}" alt="Foto de perfil">`
+      : escapar(iniciales(document.getElementById('nombres').value, document.getElementById('apellidos').value));
+  }
+
+  document.getElementById('archivo').addEventListener('change', (e) => {
+    const archivo = e.target.files[0];
+    if (!archivo) return;
+    if (archivo.size > 300 * 1024) {
+      mostrarAlerta(alerta, 'La foto supera los 300 KB permitidos');
+      return;
+    }
+    const lector = new FileReader();
+    lector.onload = () => { fotoActual = lector.result; pintarFoto(); };
+    lector.readAsDataURL(archivo);
+  });
+
+  document.getElementById('quitar-foto').addEventListener('click', () => {
+    fotoActual = null;
+    pintarFoto();
+  });
+
+  document.getElementById('formulario').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const boton = document.getElementById('guardar');
+    boton.disabled = true;
+
+    const respuesta = await api('docente/perfil', {
+      metodo: 'PUT',
+      cuerpo: {
+        nombres: document.getElementById('nombres').value.trim(),
+        apellidos: document.getElementById('apellidos').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        telefono: document.getElementById('telefono').value.trim(),
+        foto: fotoActual,
+      },
+    });
+
+    boton.disabled = false;
+    mostrarAlerta(alerta, respuesta.mensaje, respuesta.ok ? 'ok' : 'error');
+    if (respuesta.ok) pintarFoto();
+  });
+});
+</script>
+</body>
+</html>

@@ -30,14 +30,16 @@ final class Router
     public function despachar(): void
     {
         $metodo = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
-        $ruta   = '/' . trim((string)($_GET['ruta'] ?? ''), '/');
+        $ruta = '/' . trim((string)($_GET['ruta'] ?? ''), '/');
+        $existeRuta = false;
 
         foreach ($this->rutas as $item) {
             if (!preg_match($item['patron'], $ruta, $coincidencias)) {
                 continue;
             }
+            $existeRuta = true;
             if ($item['metodo'] !== $metodo) {
-                Respuesta::error("Metodo $metodo no permitido en $item[ruta].", 404);
+                continue; // la misma ruta puede admitir otros metodos
             }
 
             $args = [];
@@ -56,6 +58,9 @@ final class Router
             return;
         }
 
-        Respuesta::error('Ruta no encontrada: /api' . $ruta, 404);
+        Respuesta::error(
+            $existeRuta ? "/api$ruta no admite el metodo $metodo" : 'Ruta no encontrada: /api' . $ruta,
+            404
+        );
     }
 }
