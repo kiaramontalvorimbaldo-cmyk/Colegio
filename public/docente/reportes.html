@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mis reportes - Docencia</title>
+<link rel="stylesheet" href="../assets/css/estilos.css">
+</head>
+<body>
+<div class="app" id="app"></div>
+<script src="../assets/js/chart.umd.min.js"></script>
+
+<script type="module">
+import { iniciarPanel, svg } from '../assets/js/layout.js';
+import { api } from '../assets/js/api.js';
+import { pintarTabla, badge } from '../assets/js/tabla.js';
+import { graficoBarras, graficoAnillo } from '../assets/js/graficos.js';
+import { escapar } from '../assets/js/ui.js';
+
+iniciarPanel('DOCENTE', async (contenedor) => {
+  const r = await api('docente/reportes');
+  if (!r.ok) { contenedor.innerHTML = `<div class="alerta visible error">${escapar(r.mensaje)}</div>`; return; }
+
+  const d = r.datos;
+
+  contenedor.innerHTML = `
+    <h3 style="margin-bottom:14px">Mis reportes</h3>
+
+    <div class="rejilla" style="margin-bottom:16px">
+      <div class="indicador tarjeta">
+        <div class="icono">${svg('cursos')}</div>
+        <div><div class="valor">${d.cursos_a_cargo}</div><div class="etiqueta">Cursos a cargo</div></div>
+      </div>
+      <div class="indicador tarjeta">
+        <div class="icono">${svg('docentes')}</div>
+        <div><div class="valor">${d.estudiantes}</div><div class="etiqueta">Estudiantes</div></div>
+      </div>
+      <div class="indicador tarjeta">
+        <div class="icono">${svg('asistencia')}</div>
+        <div><div class="valor">${d.asistencia_promedio}%</div><div class="etiqueta">Asistencia promedio</div></div>
+      </div>
+      <div class="indicador tarjeta">
+        <div class="icono">${svg('incidencias')}</div>
+        <div><div class="valor">${d.incidencias_registradas}</div><div class="etiqueta">Incidencias registradas</div></div>
+      </div>
+    </div>
+
+    <div class="rejilla dos" style="margin-bottom:16px">
+      <div class="tarjeta">
+        <h3>Porcentaje de asistencia por curso</h3>
+        <p>La tardanza se cuenta como 0.5 de asistencia.</p>
+        <div class="grafico"><canvas id="grafico-asistencia"></canvas></div>
+      </div>
+      <div class="tarjeta">
+        <h3>Incidencias por estado</h3>
+        <p>Seguimiento de las incidencias que ha registrado.</p>
+        <div class="grafico"><canvas id="grafico-incidencias"></canvas></div>
+      </div>
+    </div>
+
+    <div id="tabla"></div>`;
+
+  const etiquetas = d.por_curso.map((c) => `${c.grado}-${c.seccion}`);
+  const valores = d.por_curso.map((c) => c.porcentaje);
+  graficoBarras('grafico-asistencia', etiquetas, valores, { etiqueta: 'Asistencia', sufijo: '%' });
+
+  const estados = d.incidencias_por_estado;
+  graficoAnillo('grafico-incidencias', estados.map((e) => e.estado), estados.map((e) => e.total));
+
+  pintarTabla(document.getElementById('tabla'), [
+    { titulo: 'Curso', render: (c) => `<strong>${escapar(c.nombre)}</strong>` },
+    { titulo: 'Grado', render: (c) => `${escapar(c.grado)} - ${escapar(c.seccion)}` },
+    { titulo: 'Registros', clave: 'registros' },
+    { titulo: 'Presentes', render: (c) => badge(Number(c.presentes ?? 0), 'verde') },
+    { titulo: 'Tardanzas', render: (c) => badge(Number(c.tardanzas ?? 0), 'ambar') },
+    { titulo: 'Faltas', render: (c) => badge(Number(c.faltas ?? 0), 'rojo') },
+    { titulo: 'Justificadas', render: (c) => badge(Number(c.justificadas ?? 0), 'azul') },
+    { titulo: '% asistencia', render: (c) => `<strong>${c.porcentaje}%</strong>` },
+  ], d.por_curso, 'Aun no hay datos de asistencia');
+});
+</script>
+</body>
+</html>

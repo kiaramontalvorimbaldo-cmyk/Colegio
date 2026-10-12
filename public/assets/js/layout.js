@@ -34,9 +34,9 @@ const MENUS = {
     { titulo: 'Mi horario', icono: 'horario', enlace: 'horario.html' },
     { titulo: 'Mensajes', icono: 'mensajes', enlace: 'mensajes.html' },
     { grupo: 'Aula' },
-    { titulo: 'Asistencia', icono: 'asistencia', sprint: 'Sprint 4' },
-    { titulo: 'Incidencias', icono: 'incidencias', sprint: 'Sprint 4' },
-    { titulo: 'Mis reportes', icono: 'reporte', sprint: 'Sprint 4' },
+    { titulo: 'Asistencia', icono: 'asistencia', enlace: 'asistencia.html' },
+    { titulo: 'Incidencias', icono: 'incidencias', enlace: 'incidencias.html' },
+    { titulo: 'Mis reportes', icono: 'reporte', enlace: 'reportes.html' },
   ],
   DIRECTOR: [
     { grupo: 'Principal' },

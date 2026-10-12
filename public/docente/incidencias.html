@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Incidencias - Docencia</title>
+<link rel="stylesheet" href="../assets/css/estilos.css">
+</head>
+<body>
+<div class="app" id="app"></div>
+
+<script type="module">
+import { iniciarPanel } from '../assets/js/layout.js';
+import { api } from '../assets/js/api.js';
+import { pintarTabla, badge } from '../assets/js/tabla.js';
+import { escapar, formatoFecha, mostrarAlerta } from '../assets/js/ui.js';
+
+const TIPOS = [['conducta', 'Conducta'], ['rendimiento', 'Rendimiento'], ['asistencia', 'Asistencia'], ['otro', 'Otro']];
+const COLOR_ESTADO = { pendiente: 'ambar', en_proceso: 'azul', resuelta: 'verde' };
+
+iniciarPanel('DOCENTE', async (contenedor) => {
+  const [re, ce] = await Promise.all([api('docente/estudiantes'), api('incidencias')]);
+
+  contenedor.innerHTML = `
+    <h3 style="margin-bottom:14px">Registro de incidencias</h3>
+    <div class="tarjeta" style="margin-bottom:16px">
+      <div class="alerta" id="alerta"></div>
+      <form id="formulario">
+        <div class="rejilla dos">
+          <div>
+            <div class="campo"><label for="estudiante">Estudiante</label>
+              <select id="estudiante" required>
+                ${(re.datos ?? []).map((e) => `<option value="${e.id}">${escapar(e.apellidos)}, ${escapar(e.nombres)} (${escapar(e.grado)} ${escapar(e.seccion)})</option>`).join('')}
+              </select></div>
+            <div class="campo"><label for="tipo">Tipo de incidencia</label>
+              <select id="tipo">${TIPOS.map(([v, t]) => `<option value="${v}">${t}</option>`).join('')}</select></div>
+            <div class="campo"><label for="fecha">Fecha</label>
+              <input type="date" id="fecha" value="${new Date().toISOString().slice(0, 10)}"></div>
+          </div>
+          <div>
+            <div class="campo"><label for="descripcion">Descripcion</label>
+              <textarea id="descripcion" rows="5" maxlength="1000"
+                        placeholder="Detalle lo ocurrido en el aula (minimo 10 caracteres)" required></textarea></div>
+            <button class="boton" type="submit" id="guardar">Registrar incidencia</button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div class="fila-filtros">
+      <div class="campo">
+        <label for="filtro">Filtrar por estado</label>
+        <select id="filtro">
+          <option value="">Todos</option>
+          <option value="pendiente">Pendiente</option>
+          <option value="en_proceso">En proceso</option>
+          <option value="resuelta">Resuelta</option>
+        </select>
+      </div>
+    </div>
+    <div id="tabla"></div>`;
+
+  const tabla = document.getElementById('tabla');
+  const alerta = document.getElementById('alerta');
+
+  async function cargar() {
+    const r = await api('incidencias', { params: { estado: document.getElementById('filtro').value } });
+    if (!r.ok) { mostrarAlerta(alerta, r.mensaje); return; }
+
+    pintarTabla(tabla, [
+      { titulo: 'Estudiante', render: (i) => `<strong>${escapar(i.nombres)} ${escapar(i.apellidos)}</strong><br>
+        <small style="color:var(--gris)">${escapar(i.grado)} - ${escapar(i.seccion)}</small>` },
+      { titulo: 'Tipo', render: (i) => badge(i.tipo, 'azul') },
+      { titulo: 'Descripcion', render: (i) => escapar(i.descripcion) },
+      { titulo: 'Fecha', render: (i) => formatoFecha(i.fecha) },
+      { titulo: 'Estado', render: (i) => badge(i.estado, COLOR_ESTADO[i.estado] ?? 'azul') },
+      { titulo: 'Respuesta del director', render: (i) => i.respuesta_director
+          ? escapar(i.respuesta_director) : '<span style="color:var(--gris)">Sin respuesta</span>' },
+    ], r.datos, 'No hay incidencias registradas');
+  }
+
+  document.getElementById('formulario').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const r = await api('incidencias', {
+      metodo: 'POST',
+      cuerpo: {
+        estudiante_id: Number(document.getElementById('estudiante').value),
+        tipo: document.getElementById('tipo').value,
+        descripcion: document.getElementById('descripcion').value.trim(),
+        fecha: document.getElementById('fecha').value,
+      },
+    });
+
+    if (!r.ok) { mostrarAlerta(alerta, r.mensaje); return; }
+
+    mostrarAlerta(alerta, r.mensaje + ' (estado: pendiente)', 'ok');
+    e.target.reset();
+    cargar();
+  });
+
+  document.getElementById('filtro').addEventListener('change', cargar);
+  await cargar();
+});
+</script>
+</body>
+</html>

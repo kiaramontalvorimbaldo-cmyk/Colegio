@@ -74,6 +74,57 @@ final class DocenteController
         Respuesta::json($horario, 'Horario semanal: ' . $total . ' clases');
     }
 
+    /** GET /api/docente/estudiantes - alumnos de los cursos del docente. */
+    public function estudiantes(): never
+    {
+        Auth::exigirRol('DOCENTE');
+        $estudiantes = (new Estudiante())->porDocente($this->docenteId());
+        Respuesta::json($estudiantes, 'Estudiantes a cargo: ' . count($estudiantes));
+    }
+
+    /** GET /api/docente/reportes - consolidado para el panel de reportes. */
+    public function reportes(): never
+    {
+        Auth::exigirRol('DOCENTE');
+        $docenteId = $this->docenteId();
+
+        $cursos = (new Curso())->porDocente($docenteId);
+        $porCurso = (new Asistencia())->resumenPorCurso($docenteId);
+        $conteo = (new Incidencia())->conteoPorEstado($docenteId);
+
+        // Promedio ponderado por la cantidad de registros de cada curso
+        $registros = 0;
+        $efectivas = 0.0;
+        foreach ($porCurso as $curso) {
+            $registros += (int)$curso['registros'];
+            $efectivas += (int)$curso['presentes'] + (int)$curso['tardanzas'] * 0.5;
+        }
+
+        $porEstado = array_map(
+            static fn(string $e): array => ['estado' => $e, 'total' => 0],
+            ['pendiente', 'en_proceso', 'resuelta']
+        );
+        $totalIncidencias = 0;
+        foreach ($conteo as $fila) {
+            $totalIncidencias += (int)$fila['total'];
+            foreach ($porEstado as $i => $estado) {
+                if ($estado['estado'] === $fila['estado']) {
+                    $porEstado[$i]['total'] = (int)$fila['total'];
+                }
+            }
+        }
+
+        Respuesta::json([
+            'cursos_a_cargo'            => count($cursos),
+            'estudiantes'               => count((new Estudiante())->porDocente($docenteId)),
+            'asistencia_promedio'       => $registros > 0 ? round($efectivas / $registros * 100, 1) : 0.0,
+            'asistencias_registradas'   => $registros,
+            'incidencias_registradas'   => $totalIncidencias,
+            'por_curso'                 => $porCurso,
+            'incidencias_por_estado'    => $porEstado,
+        ], 'Reporte del docente');
+    }
+
     private function docenteId(): int
     {
         $id = (new Docente())->idDeUsuario(Auth::id());

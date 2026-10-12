@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Asistencia - Docencia</title>
+<link rel="stylesheet" href="../assets/css/estilos.css">
+</head>
+<body>
+<div class="app" id="app"></div>
+
+<script type="module">
+import { iniciarPanel } from '../assets/js/layout.js';
+import { api } from '../assets/js/api.js';
+import { escapar, mostrarAlerta } from '../assets/js/ui.js';
+
+const ESTADOS = [
+  ['pendiente', 'Sin registrar'],
+  ['presente', 'Presente'],
+  ['tardanza', 'Tardanza'],
+  ['falta', 'Falta'],
+  ['justificada', 'Justificada'],
+];
+
+iniciarPanel('DOCENTE', async (contenedor) => {
+  const rc = await api('docente/cursos');
+  if (!rc.ok) { contenedor.innerHTML = `<div class="alerta visible error">${escapar(rc.mensaje)}</div>`; return; }
+
+  const hoy = new Date().toISOString().slice(0, 10);
+
+  contenedor.innerHTML = `
+    <h3 style="margin-bottom:14px">Toma de asistencia</h3>
+    <div class="tarjeta" style="margin-bottom:16px">
+      <div class="fila-filtros">
+        <div class="campo">
+          <label for="curso">Curso</label>
+          <select id="curso">
+            ${rc.datos.map((c) => `<option value="${c.id}">${escapar(c.nombre)} - ${escapar(c.grado)} ${escapar(c.seccion)}</option>`).join('')}
+          </select>
+        </div>
+        <div class="campo">
+          <label for="fecha">Fecha</label>
+          <input type="date" id="fecha" value="${hoy}">
+        </div>
+        <button class="boton" id="cargar">Cargar lista</button>
+        <button class="boton secundario" id="presentes">Marcar todos presentes</button>
+      </div>
+      <div class="alerta" id="alerta"></div>
+    </div>
+    <div id="tabla"></div>`;
+
+  const tabla = document.getElementById('tabla');
+  const alerta = document.getElementById('alerta');
+  let estudiantes = [];
+
+  function pintarLista() {
+    if (estudiantes.length === 0) {
+      tabla.innerHTML = `<div class="tarjeta"><p class="vacio">Seleccione un curso y una fecha para cargar la lista</p></div>`;
+      return;
+    }
+
+    const filas = estudiantes.map((e) => `
+      <tr>
+        <td><strong>${escapar(e.nombres)} ${escapar(e.apellidos)}</strong></td>
+        <td>${escapar(e.dni)}</td>
+        <td>
+          <select data-id="${e.id}">
+            ${ESTADOS.map(([v, t]) => `<option value="${v}" ${e.estado === v ? 'selected' : ''}>${t}</option>`).join('')}
+          </select>
+        </td>
+        <td>${e.asistencia_id ? '<span class="badge verde">Registrada</span>' : '<span class="badge ambar">Nueva</span>'}</td>
+      </tr>`).join('');
+
+    tabla.innerHTML = `
+      <div class="tarjeta" style="padding:0;overflow-x:auto">
+        <table class="tabla">
+          <thead><tr><th>Estudiante</th><th>DNI</th><th>Estado</th><th>Registro</th></tr></thead>
+          <tbody>${filas}</tbody>
+        </table>
+        <div style="padding:14px">
+          <button class="boton" id="guardar">Guardar asistencia</button>
+        </div>
+      </div>`;
+
+    document.getElementById('guardar').addEventListener('click', guardar);
+  }
+
+  async function cargar() {
+    mostrarAlerta(alerta, '');
+    const r = await api('asistencias', {
+      params: { curso_id: document.getElementById('curso').value, fecha: document.getElementById('fecha').value },
+    });
+
+    if (!r.ok) { mostrarAlerta(alerta, r.mensaje); estudiantes = []; pintarLista(); return; }
+
+    estudiantes = r.datos.estudiantes;
+    pintarLista();
+    mostrarAlerta(alerta, r.mensaje, 'ok');
+  }
+
+  async function guardar() {
+    const registros = [...tabla.querySelectorAll('select[data-id]')].map((s) => ({
+      estudiante_id: Number(s.dataset.id),
+      estado: s.value,
+    }));
+
+    const r = await api('asistencias', {
+      metodo: 'POST',
+      cuerpo: {
+        curso_id: Number(document.getElementById('curso').value),
+        fecha: document.getElementById('fecha').value,
+        registros,
+      },
+    });
+
+    mostrarAlerta(alerta, r.mensaje, r.ok ? 'ok' : 'error');
+    if (r.ok) await cargar();
+  }
+
+  document.getElementById('cargar').addEventListener('click', cargar);
+  document.getElementById('presentes').addEventListener('click', () => {
+    tabla.querySelectorAll('select[data-id]').forEach((s) => { s.value = 'presente'; });
+  });
+
+  await cargar();
+});
+</script>
+</body>
+</html>

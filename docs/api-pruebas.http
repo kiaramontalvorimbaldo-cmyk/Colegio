@@ -107,3 +107,68 @@ Content-Type: application/json
   "asunto": "",
   "cuerpo": "Mensaje sin asunto"
 }
+
+### ---------------- DOCENTE: ASISTENCIA E INCIDENCIAS (Sprint 4) ----------------
+
+### Lista de estudiantes del curso con su estado del dia -> 200
+GET {{base}}/asistencias?curso_id=1&fecha=2026-03-11
+Accept: application/json
+
+### Guardado masivo (crea) -> 200
+POST {{base}}/asistencias
+Content-Type: application/json
+
+{
+  "curso_id": 1,
+  "fecha": "2026-03-11",
+  "registros": [
+    { "estudiante_id": 7, "estado": "presente" },
+    { "estudiante_id": 8, "estado": "falta" },
+    { "estudiante_id": 9, "estado": "tardanza" }
+  ]
+}
+
+### Re-guardar la misma fecha edita, no duplica (UNIQUE curso+estudiante+fecha) -> 200
+POST {{base}}/asistencias
+Content-Type: application/json
+
+{
+  "curso_id": 1,
+  "fecha": "2026-03-11",
+  "registros": [
+    { "estudiante_id": 8, "estado": "presente" }
+  ]
+}
+
+### Estado invalido -> 400
+POST {{base}}/asistencias
+Content-Type: application/json
+
+{
+  "curso_id": 1,
+  "fecha": "2026-03-11",
+  "registros": [ { "estudiante_id": 7, "estado": "volando" } ]
+}
+
+### Curso de otro docente -> 403
+GET {{base}}/asistencias?curso_id=3&fecha=2026-03-11
+Accept: application/json
+
+### Registrar incidencia (nace en estado pendiente) -> 201
+POST {{base}}/incidencias
+Content-Type: application/json
+
+{
+  "estudiante_id": 7,
+  "tipo": "conducta",
+  "descripcion": "Uso reiterado del celular durante la clase de programacion.",
+  "fecha": "2026-04-14"
+}
+
+### Incidencias del docente, con filtro por estado -> 200
+GET {{base}}/incidencias?estado=pendiente
+Accept: application/json
+
+### Reporte consolidado del docente -> 200
+GET {{base}}/docente/reportes
+Accept: application/json

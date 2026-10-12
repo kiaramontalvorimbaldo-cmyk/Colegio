@@ -213,6 +213,12 @@ tbody tr:hover{background:#f8fafc}
 .clase .meta{color:var(--gris);display:block}
 .clase .aula{color:var(--azul-claro);font-weight:600}
 .sin-clases{color:var(--gris);font-size:.76rem;text-align:center;padding:10px 0}
+.tabla td select,.tabla td input{
+  padding:5px 8px;border:1px solid var(--borde);border-radius:6px;font-size:.8rem;background:var(--blanco);
+}
+.fila-filtros{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;margin-bottom:16px}
+.fila-filtros .campo{margin:0;min-width:190px}
+.grafico{height:290px}
 
 /* ------------------------------------------------------- modal */
 .overlay{

@@ -59,6 +59,14 @@ $router->agregar('PUT', 'docente/perfil',  DocenteController::class, 'actualizar
 $router->agregar('GET', 'docente/cursos',  DocenteController::class, 'cursos',          ['DOCENTE']);
 $router->agregar('GET', 'docente/horario', DocenteController::class, 'horario',         ['DOCENTE']);
 
+// Asistencia e incidencias del docente (Sprint 4)
+$router->agregar('GET',  'docente/estudiantes', DocenteController::class,  'estudiantes', ['DOCENTE']);
+$router->agregar('GET',  'docente/reportes',    DocenteController::class,  'reportes',    ['DOCENTE']);
+$router->agregar('GET',  'asistencias',         AsistenciaController::class, 'index',     ['DOCENTE']);
+$router->agregar('POST', 'asistencias',         AsistenciaController::class, 'crear',     ['DOCENTE']);
+$router->agregar('GET',  'incidencias',         IncidenciaController::class,  'index',     ['DOCENTE']);
+$router->agregar('POST', 'incidencias',         IncidenciaController::class,  'crear',     ['DOCENTE']);
+
 // Mensajeria entre docentes y direccion
 $router->agregar('GET',  'mensajes', MensajeController::class, 'index',  ['DOCENTE', 'DIRECTOR']);
 $router->agregar('POST', 'mensajes', MensajeController::class, 'crear',  ['DOCENTE']);
