@@ -25,6 +25,7 @@
 body{
   font-family:"Segoe UI",Roboto,Arial,sans-serif;
   background:var(--fondo);color:var(--texto);font-size:15px;line-height:1.5;
+  overflow-x:hidden;
 }
 
 a{text-decoration:none;color:inherit}
@@ -249,6 +250,10 @@ tbody tr:hover{background:#f8fafc}
 }
 
 /* --------------------------------------------------------- responsive */
+@media (max-width:560px){
+  .buscador{display:none}
+}
+
 @media (max-width:900px){
   .app{flex-direction:column}
   .lateral{position:static;width:100%;flex-direction:column}
@@ -257,7 +262,13 @@ tbody tr:hover{background:#f8fafc}
   .menu a{white-space:nowrap;margin:0 4px 0 0}
   .lateral-pie{display:none}
   .principal{margin-left:0}
-  .buscador input{width:110px}
+  .cabecera{padding:10px 12px;gap:8px}
+  .cabecera h2{font-size:.92rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+  .perfil{flex-shrink:0}
+  .buscador{flex:1;min-width:0}
+  .buscador input{width:100%;min-width:0}
+  .avatar{width:34px;height:34px}
+  #btn-salir{padding:8px 10px}
   .perfil-datos{display:none}
   .grilla-horario{grid-template-columns:1fr}
   .grilla-horario .dia.vacio{display:none}

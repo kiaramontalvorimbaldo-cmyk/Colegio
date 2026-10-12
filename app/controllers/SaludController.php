@@ -21,7 +21,6 @@ final class SaludController
         Respuesta::json([
             'servicio'       => 'API Administracion Academica - I.E.P. Sagrado Corazon de Jesus',
             'version'        => '1.0.0',
-            'sprint'         => 1,
             'php'            => PHP_VERSION,
             'base_datos'     => $pdo->query('SELECT DATABASE()')->fetchColumn(),
             'mysql'          => $pdo->getAttribute(PDO::ATTR_SERVER_VERSION),

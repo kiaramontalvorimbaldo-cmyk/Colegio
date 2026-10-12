@@ -1,153 +1,254 @@
 -- =====================================================================
--- Sprint 1 - Datos de prueba (seed)
+-- Datos de prueba (export final v1.0) - ejecutar despues de 01_schema.sql
 -- Sistema de Administracion Academica - I.E.P. Sagrado Corazon de Jesus
--- Ejecutar en phpMyAdmin DESPUES de 01_schema.sql
--- Credenciales: director / Director123*   |   docente / Docente123*
+-- Export con mysqldump de la base validada en los 7 sprints.
+-- Cuentas: director / Director123*   |   docente / Docente123*
 -- =====================================================================
 USE sagrado_corazon;
 SET NAMES utf8mb4;
+SET FOREIGN_KEY_CHECKS = 0;
 
--- ---------------------------------------------------------------- roles
-INSERT INTO roles (id, nombre, descripcion) VALUES
-(1, 'DOCENTE',  'Docente de aula: cursos, horarios, asistencia e incidencias'),
-(2, 'DIRECTOR', 'Directivo: incidencias, evaluacion docente, cursos y economia');
-
--- ------------------------------------------------------------- usuarios
-INSERT INTO usuarios (id, rol_id, usuario, password_hash, nombres, apellidos, email, telefono) VALUES
-(1, 2, 'director', '$2y$10$nUpWPvS0MDNjJVBhnbhGaeR/5NfK0bjzH634G/2UTEFGX/FL/3HdW', 'Maria',   'Fernandez Caisa',  'director@sagradocorazon.edu.pe', '900111222'),
-(2, 1, 'docente',  '$2y$10$XvaNMh4LbsGN5C/.2YXLEebvNAqk.BeFgZKJ6GLdUjomPEWMqvlBO', 'Carlos', 'Quispe Rojas',    'cquispe@sagradocorazon.edu.pe',  '900222333'),
-(3, 1, 'jramirez', '$2y$10$XvaNMh4LbsGN5C/.2YXLEebvNAqk.BeFgZKJ6GLdUjomPEWMqvlBO', 'Lucia',  'Ramirez Diaz',    'lramirez@sagradocorazon.edu.pe', '900222444'),
-(4, 1, 'mflores',  '$2y$10$XvaNMh4LbsGN5C/.2YXLEebvNAqk.BeFgZKJ6GLdUjomPEWMqvlBO', 'Jorge',  'Flores Aguilar',  'jflores@sagradocorazon.edu.pe',  '900222555');
-
--- ------------------------------------------------------------- docentes
-INSERT INTO docentes (id, usuario_id, dni, especialidad, sueldo) VALUES
-(1, 2, '45218763', 'Programacion y Multimedia', 1800.00),
-(2, 3, '48125374', 'Matematicas',                1600.00),
-(3, 4, '70918452', 'Lengua y Comunicacion',      1500.00);
-
--- ---------------------------------------------------------- estudiantes
-INSERT INTO estudiantes (id, dni, nombres, apellidos, grado, seccion) VALUES
-(1,  '73120548', 'Ana',      'Gamarra Ruiz',    '5to', 'A'),
-(2,  '73120549', 'Luis',     'Chavez Paredes',  '5to', 'A'),
-(3,  '73120550', 'Maria',    'Torres Mejia',    '5to', 'A'),
-(4,  '73120551', 'Jose',     'Alvarado Sequeira','5to','A'),
-(5,  '73120552', 'Lucia',    'Castro Mendoza',  '5to', 'A'),
-(6,  '73120553', 'Diego',    'Ramirez Silva',   '5to', 'A'),
-(7,  '73120554', 'Rosa',     'Espinoza Lara',   '5to', 'A'),
-(8,  '73120555', 'Carlos',   'Munarriz Vega',   '5to', 'A'),
-(9,  '73120556', 'Sofia',    'Bermudez Gil',    '5to', 'A'),
-(10, '73120557', 'Andres',   'Quiroz Medina',   '5to', 'A'),
-(11, '73120558', 'Karla',    'Ayala Ponce',     '5to', 'B'),
-(12, '73120559', 'Pedro',    'Salazar Yupanqui', '5to', 'B'),
-(13, '73120560', 'Elena',    'Rojas Alvarado',  '5to', 'B'),
-(14, '73120561', 'Miguel',   'Cordova Sanchez', '5to', 'B'),
-(15, '73120562', 'Milagros', 'Damian Nunez',    '5to', 'B'),
-(16, '73120563', 'Renzo',    'Palomino Vega',   '5to', 'B'),
-(17, '73120564', 'Gabriela', 'Tapia Oblando',   '5to', 'B'),
-(18, '73120565', 'Iván',     'Gutierrez Arana', '6to', 'A'),
-(19, '73120566', 'Nicole',   'Perez Alvarado',  '6to', 'A'),
-(20, '73120567', 'Santiago', 'Ledesma Quiroz',  '6to', 'A'),
-(21, '73120568', 'Camila',   'Vasquez Rios',    '6to', 'A'),
-(22, '73120569', 'Sebastian','Moro Cornejo',     '6to', 'A'),
-(23, '73120570', 'Fernanda', 'Zapata Huerta',   '6to', 'A'),
-(24, '73120571', 'Bruno',    'Condori Mamani',  '6to', 'B'),
-(25, '73120572', 'Valeria',  'Reyes Bravo',     '6to', 'B'),
-(26, '73120573', 'Alonso',   'Pinedo Salcedo',  '6to', 'B'),
-(27, '73120574', 'Tatiana',  'Castro Miranda',  '6to', 'B'),
-(28, '73120575', 'Horacio',  'Bustamante Diaz', '6to', 'B'),
-(29, '73120576', 'Lourdes',  'Chira Arteaga',   '6to', 'B'),
-(30, '73120577', 'Wilson',   'Farias Niquen',   '6to', 'B');
-
--- --------------------------------------------------- parametros de la BD
-INSERT INTO parametros_economicos (id, pension_mensual, num_estudiantes, gastos_operativos, meses) VALUES
-(1, 350.00, 30, 4500.00, 5);
-
--- --------------------------------------------------------------- cursos
-INSERT INTO cursos (id, nombre, grado, seccion, periodo, docente_id) VALUES
-(1, 'Programacion Grafica y Multimedia I', '5to', 'A', '2026-1', 1),
-(2, 'Programacion Grafica y Multimedia I', '5to', 'B', '2026-1', 1),
-(3, 'Matematica',                          '6to', 'A', '2026-1', 2),
-(4, 'Lengua y Comunicacion',               '6to', 'A', '2026-1', 3),
-(5, 'Lengua y Comunicacion',               '6to', 'B', '2026-1', 3);
-
--- ------------------------------------------------------------- horarios
-INSERT INTO horarios (curso_id, dia, hora_inicio, hora_fin, aula) VALUES
-(1, 1, '07:00', '08:30', 'A-201'),
-(1, 3, '09:00', '10:30', 'Lab-Computo'),
-(2, 2, '07:00', '08:30', 'A-201'),
-(2, 4, '09:00', '10:30', 'Lab-Computo'),
-(3, 1, '09:00', '10:30', 'B-102'),
-(3, 5, '07:00', '08:30', 'B-102'),
-(4, 2, '09:00', '10:30', 'A-103'),
-(4, 4, '07:00', '08:30', 'A-103'),
-(5, 3, '07:00', '08:30', 'A-104'),
-(5, 5, '09:00', '10:30', 'A-104');
-
--- ----------------------------------------------------------- incidencias
-INSERT INTO incidencias (estudiante_id, docente_id, tipo, descripcion, fecha, estado, respuesta_director, fecha_respuesta) VALUES
-(2,  1, 'conducta',    'Discusion con companero durante el desarrollo de la clase.',                 '2026-03-03', 'resuelta',   'Se converso con el tutor del aula. Comportamiento en mejora.', '2026-03-04 09:15:00'),
-(6,  1, 'asistencia',  'Ausencia injustificada por tres dias consecutivos.',                        '2026-03-05', 'en_proceso', NULL, NULL),
-(11, 2, 'rendimiento', 'Bajo rendimiento en operaciones algebraicas; no entrega tareas.',             '2026-03-06', 'pendiente',  NULL, NULL),
-(19, 3, 'conducta',    'Uso de celular en clase de forma reiterada.',                               '2026-03-09', 'pendiente',  NULL, NULL),
-(27, 3, 'otro',        'Entrego el trabajo de comunicacion con datos incompletos y fuera de fecha.', '2026-03-11', 'resuelta',   'Se reprogramo la exposicion grupal.', '2026-03-12 11:40:00');
-
--- ------------------------------------------------- evaluaciones docentes
-INSERT INTO evaluaciones_docentes (docente_id, director_id, puntaje, observaciones, fecha) VALUES
-(1, 1, 5, 'Excelente manejo de aula y uso del laboratorio de computo.', '2026-03-02'),
-(1, 1, 4, 'Cumple con la programacion establecida y sus clases son puntuales.', '2026-04-02'),
-(2, 1, 4, 'Buen manejo de los materiales de matematica.', '2026-03-02'),
-(3, 1, 3, 'Debe mejorar la evaluacion de tareas y la participacion de los estudiantes.', '2026-03-07');
-
--- ------------------------------------------------------- ugel_contactos
-INSERT INTO ugel_contactos (id, nombre, cargo, email, telefono, direccion) VALUES
-(1, 'UGEL Chiclayo', 'Oficina de Innovacion Educational', 'ugel.chiclayo@educacion.gob.pe', '900333444', 'Av. Balta 1200, Chiclayo');
-
--- ------------------------------------------------------------- mensajes
-INSERT INTO mensajes (remitente_id, destinatario_id, asunto, cuerpo, fecha, leido) VALUES
-(2, 1, 'Solicitud de material para el laboratorio', 'Estimada senora, necesito un proyector adicional para el laboratorio de computo del 5to grado.', '2026-03-10 08:20:00', 1),
-(3, 1, 'Reporte de asistencia de 6to A',           'Adjunto el detalle de asistencias de la semana del 6to grado A.', '2026-03-11 10:05:00', 1),
-(1, 2, 'Respuesta sobre el horario de recuperacion', 'Por favor confirmar la clase de recuperacion del dia jueves a las 11:00 am.', '2026-03-12 09:00:00', 0);
-
-INSERT INTO mensajes (remitente_id, destinatario_ugel_id, asunto, cuerpo, fecha, leido) VALUES
-(1, 1, 'Informe academico del periodo 2026-1', 'Adjuntamos el informe de gestion academica correspondiente al periodo 2026-1.', '2026-03-13 10:30:00', 0);
-
--- ------------------------------------------------------- plantillas UGEL
-INSERT INTO plantillas_ugel (id, nombre, contenido_html) VALUES
-(1, 'Oficio de informe de gestion academica',
- '<h2 style="text-align:center">OFICIO DE INFORME</h2>
-  <p><strong>Señor/a:</strong> Director(a) de la {{institucion}}</p>
-  <p><strong>Asunto:</strong> Informe de gestion academica del periodo lectivo {{periodo}}</p>
-  <p>Estimado(a) {{director}}, por medio de la presente remitimos el informe correspondiente al periodo indicado para su conocimiento y fines.</p>'),
-(2, 'Solicitud de apoyo para implementacion tecnologica',
- '<h2 style="text-align:center">SOLICITUD DE APOYO</h2>
-  <p><strong>Institucion:</strong> {{institucion}}</p>
-  <p><strong>Fecha:</strong> {{fecha}}</p>
-  <p>Estimado(a) {{director}}, solicitamos el apoyo pertinente para la mejora de los recursos tecnologicos de nuestra institucion.</p>');
-
--- ---------------------------------------------------------------- pagos
--- 30 estudiantes x 5 meses del periodo (2026-03 a 2026-07), monto 350.00
--- Se marca 'pendiente' de forma deterministica para generar morosidad (~15%).
-INSERT INTO pagos (estudiante_id, mes, monto, estado)
-SELECT e.id,
-       CONCAT('2026-', LPAD(m.num, 2, '0')),
-       350.00,
-       CASE WHEN MOD(e.id * 3 + m.num, 9) = 0 THEN 'pendiente' ELSE 'pagado' END
-FROM estudiantes e
-CROSS JOIN (SELECT 3 AS num UNION ALL SELECT 4 UNION ALL SELECT 5
-            UNION ALL SELECT 6 UNION ALL SELECT 7) m;
-
--- --------------------------------------------------------- asistencias
--- Registro de muestra: curso 1 (5to A) en dos fechas
-INSERT INTO asistencias (curso_id, estudiante_id, fecha, estado, registrado_por) VALUES
-(1, 1,  '2026-03-09', 'presente',    2),
-(1, 2,  '2026-03-09', 'falta',       2),
-(1, 3,  '2026-03-09', 'tardanza',    2),
-(1, 4,  '2026-03-09', 'presente',    2),
-(1, 5,  '2026-03-09', 'justificada', 2),
-(1, 6,  '2026-03-09', 'presente',    2),
-(1, 1,  '2026-03-10', 'presente',    2),
-(1, 2,  '2026-03-10', 'justificada', 2),
-(1, 3,  '2026-03-10', 'presente',    2),
-(1, 4,  '2026-03-10', 'falta',       2),
-(1, 5,  '2026-03-10', 'presente',    2),
-(1, 6,  '2026-03-10', 'presente',    2);
+INSERT INTO `asistencias` (`id`, `curso_id`, `estudiante_id`, `fecha`, `estado`, `registrado_por`, `creado_en`) VALUES (1,1,1,'2026-03-09','presente',2,'2026-10-12 00:01:05');
+INSERT INTO `asistencias` (`id`, `curso_id`, `estudiante_id`, `fecha`, `estado`, `registrado_por`, `creado_en`) VALUES (2,1,2,'2026-03-09','falta',2,'2026-10-12 00:01:05');
+INSERT INTO `asistencias` (`id`, `curso_id`, `estudiante_id`, `fecha`, `estado`, `registrado_por`, `creado_en`) VALUES (3,1,3,'2026-03-09','tardanza',2,'2026-10-12 00:01:05');
+INSERT INTO `asistencias` (`id`, `curso_id`, `estudiante_id`, `fecha`, `estado`, `registrado_por`, `creado_en`) VALUES (4,1,4,'2026-03-09','presente',2,'2026-10-12 00:01:05');
+INSERT INTO `asistencias` (`id`, `curso_id`, `estudiante_id`, `fecha`, `estado`, `registrado_por`, `creado_en`) VALUES (5,1,5,'2026-03-09','justificada',2,'2026-10-12 00:01:05');
+INSERT INTO `asistencias` (`id`, `curso_id`, `estudiante_id`, `fecha`, `estado`, `registrado_por`, `creado_en`) VALUES (6,1,6,'2026-03-09','presente',2,'2026-10-12 00:01:05');
+INSERT INTO `asistencias` (`id`, `curso_id`, `estudiante_id`, `fecha`, `estado`, `registrado_por`, `creado_en`) VALUES (7,1,1,'2026-03-10','presente',2,'2026-10-12 00:01:05');
+INSERT INTO `asistencias` (`id`, `curso_id`, `estudiante_id`, `fecha`, `estado`, `registrado_por`, `creado_en`) VALUES (8,1,2,'2026-03-10','justificada',2,'2026-10-12 00:01:05');
+INSERT INTO `asistencias` (`id`, `curso_id`, `estudiante_id`, `fecha`, `estado`, `registrado_por`, `creado_en`) VALUES (9,1,3,'2026-03-10','presente',2,'2026-10-12 00:01:05');
+INSERT INTO `asistencias` (`id`, `curso_id`, `estudiante_id`, `fecha`, `estado`, `registrado_por`, `creado_en`) VALUES (10,1,4,'2026-03-10','falta',2,'2026-10-12 00:01:05');
+INSERT INTO `asistencias` (`id`, `curso_id`, `estudiante_id`, `fecha`, `estado`, `registrado_por`, `creado_en`) VALUES (11,1,5,'2026-03-10','presente',2,'2026-10-12 00:01:05');
+INSERT INTO `asistencias` (`id`, `curso_id`, `estudiante_id`, `fecha`, `estado`, `registrado_por`, `creado_en`) VALUES (12,1,6,'2026-03-10','presente',2,'2026-10-12 00:01:05');
+INSERT INTO `asistencias` (`id`, `curso_id`, `estudiante_id`, `fecha`, `estado`, `registrado_por`, `creado_en`) VALUES (13,1,7,'2026-03-11','presente',2,'2026-10-12 00:25:10');
+INSERT INTO `asistencias` (`id`, `curso_id`, `estudiante_id`, `fecha`, `estado`, `registrado_por`, `creado_en`) VALUES (14,1,8,'2026-03-11','presente',2,'2026-10-12 00:25:10');
+INSERT INTO `asistencias` (`id`, `curso_id`, `estudiante_id`, `fecha`, `estado`, `registrado_por`, `creado_en`) VALUES (15,1,9,'2026-03-11','presente',2,'2026-10-12 00:25:10');
+INSERT INTO `asistencias` (`id`, `curso_id`, `estudiante_id`, `fecha`, `estado`, `registrado_por`, `creado_en`) VALUES (16,1,10,'2026-03-11','justificada',2,'2026-10-12 00:25:10');
+INSERT INTO `cursos` (`id`, `nombre`, `grado`, `seccion`, `periodo`, `docente_id`) VALUES (1,'Programacion Grafica y Multimedia I','5to','A','2026-1',1);
+INSERT INTO `cursos` (`id`, `nombre`, `grado`, `seccion`, `periodo`, `docente_id`) VALUES (2,'Programacion Grafica y Multimedia I','5to','B','2026-1',1);
+INSERT INTO `cursos` (`id`, `nombre`, `grado`, `seccion`, `periodo`, `docente_id`) VALUES (3,'Matematica','6to','A','2026-1',2);
+INSERT INTO `cursos` (`id`, `nombre`, `grado`, `seccion`, `periodo`, `docente_id`) VALUES (4,'Lengua y Comunicacion','6to','A','2026-1',3);
+INSERT INTO `cursos` (`id`, `nombre`, `grado`, `seccion`, `periodo`, `docente_id`) VALUES (5,'Lengua y Comunicacion','6to','B','2026-1',3);
+INSERT INTO `docentes` (`id`, `usuario_id`, `dni`, `especialidad`, `sueldo`) VALUES (1,2,'45218763','Programacion y Multimedia',1800.00);
+INSERT INTO `docentes` (`id`, `usuario_id`, `dni`, `especialidad`, `sueldo`) VALUES (2,3,'48125374','Matematicas',1600.00);
+INSERT INTO `docentes` (`id`, `usuario_id`, `dni`, `especialidad`, `sueldo`) VALUES (3,4,'70918452','Lengua y Comunicacion',1500.00);
+INSERT INTO `docentes` (`id`, `usuario_id`, `dni`, `especialidad`, `sueldo`) VALUES (4,5,'70551234','Matematicas',1550.00);
+INSERT INTO `estudiantes` (`id`, `dni`, `nombres`, `apellidos`, `grado`, `seccion`) VALUES (1,'73120548','Ana','Gamarra Ruiz','5to','A');
+INSERT INTO `estudiantes` (`id`, `dni`, `nombres`, `apellidos`, `grado`, `seccion`) VALUES (2,'73120549','Luis','Chavez Paredes','5to','A');
+INSERT INTO `estudiantes` (`id`, `dni`, `nombres`, `apellidos`, `grado`, `seccion`) VALUES (3,'73120550','Maria','Torres Mejia','5to','A');
+INSERT INTO `estudiantes` (`id`, `dni`, `nombres`, `apellidos`, `grado`, `seccion`) VALUES (4,'73120551','Jose','Alvarado Sequeira','5to','A');
+INSERT INTO `estudiantes` (`id`, `dni`, `nombres`, `apellidos`, `grado`, `seccion`) VALUES (5,'73120552','Lucia','Castro Mendoza','5to','A');
+INSERT INTO `estudiantes` (`id`, `dni`, `nombres`, `apellidos`, `grado`, `seccion`) VALUES (6,'73120553','Diego','Ramirez Silva','5to','A');
+INSERT INTO `estudiantes` (`id`, `dni`, `nombres`, `apellidos`, `grado`, `seccion`) VALUES (7,'73120554','Rosa','Espinoza Lara','5to','A');
+INSERT INTO `estudiantes` (`id`, `dni`, `nombres`, `apellidos`, `grado`, `seccion`) VALUES (8,'73120555','Carlos','Munarriz Vega','5to','A');
+INSERT INTO `estudiantes` (`id`, `dni`, `nombres`, `apellidos`, `grado`, `seccion`) VALUES (9,'73120556','Sofia','Bermudez Gil','5to','A');
+INSERT INTO `estudiantes` (`id`, `dni`, `nombres`, `apellidos`, `grado`, `seccion`) VALUES (10,'73120557','Andres','Quiroz Medina','5to','A');
+INSERT INTO `estudiantes` (`id`, `dni`, `nombres`, `apellidos`, `grado`, `seccion`) VALUES (11,'73120558','Karla','Ayala Ponce','5to','B');
+INSERT INTO `estudiantes` (`id`, `dni`, `nombres`, `apellidos`, `grado`, `seccion`) VALUES (12,'73120559','Pedro','Salazar Yupanqui','5to','B');
+INSERT INTO `estudiantes` (`id`, `dni`, `nombres`, `apellidos`, `grado`, `seccion`) VALUES (13,'73120560','Elena','Rojas Alvarado','5to','B');
+INSERT INTO `estudiantes` (`id`, `dni`, `nombres`, `apellidos`, `grado`, `seccion`) VALUES (14,'73120561','Miguel','Cordova Sanchez','5to','B');
+INSERT INTO `estudiantes` (`id`, `dni`, `nombres`, `apellidos`, `grado`, `seccion`) VALUES (15,'73120562','Milagros','Damian Nunez','5to','B');
+INSERT INTO `estudiantes` (`id`, `dni`, `nombres`, `apellidos`, `grado`, `seccion`) VALUES (16,'73120563','Renzo','Palomino Vega','5to','B');
+INSERT INTO `estudiantes` (`id`, `dni`, `nombres`, `apellidos`, `grado`, `seccion`) VALUES (17,'73120564','Gabriela','Tapia Oblando','5to','B');
+INSERT INTO `estudiantes` (`id`, `dni`, `nombres`, `apellidos`, `grado`, `seccion`) VALUES (18,'73120565','Iván','Gutierrez Arana','6to','A');
+INSERT INTO `estudiantes` (`id`, `dni`, `nombres`, `apellidos`, `grado`, `seccion`) VALUES (19,'73120566','Nicole','Perez Alvarado','6to','A');
+INSERT INTO `estudiantes` (`id`, `dni`, `nombres`, `apellidos`, `grado`, `seccion`) VALUES (20,'73120567','Santiago','Ledesma Quiroz','6to','A');
+INSERT INTO `estudiantes` (`id`, `dni`, `nombres`, `apellidos`, `grado`, `seccion`) VALUES (21,'73120568','Camila','Vasquez Rios','6to','A');
+INSERT INTO `estudiantes` (`id`, `dni`, `nombres`, `apellidos`, `grado`, `seccion`) VALUES (22,'73120569','Sebastian','Moro Cornejo','6to','A');
+INSERT INTO `estudiantes` (`id`, `dni`, `nombres`, `apellidos`, `grado`, `seccion`) VALUES (23,'73120570','Fernanda','Zapata Huerta','6to','A');
+INSERT INTO `estudiantes` (`id`, `dni`, `nombres`, `apellidos`, `grado`, `seccion`) VALUES (24,'73120571','Bruno','Condori Mamani','6to','B');
+INSERT INTO `estudiantes` (`id`, `dni`, `nombres`, `apellidos`, `grado`, `seccion`) VALUES (25,'73120572','Valeria','Reyes Bravo','6to','B');
+INSERT INTO `estudiantes` (`id`, `dni`, `nombres`, `apellidos`, `grado`, `seccion`) VALUES (26,'73120573','Alonso','Pinedo Salcedo','6to','B');
+INSERT INTO `estudiantes` (`id`, `dni`, `nombres`, `apellidos`, `grado`, `seccion`) VALUES (27,'73120574','Tatiana','Castro Miranda','6to','B');
+INSERT INTO `estudiantes` (`id`, `dni`, `nombres`, `apellidos`, `grado`, `seccion`) VALUES (28,'73120575','Horacio','Bustamante Diaz','6to','B');
+INSERT INTO `estudiantes` (`id`, `dni`, `nombres`, `apellidos`, `grado`, `seccion`) VALUES (29,'73120576','Lourdes','Chira Arteaga','6to','B');
+INSERT INTO `estudiantes` (`id`, `dni`, `nombres`, `apellidos`, `grado`, `seccion`) VALUES (30,'73120577','Wilson','Farias Niquen','6to','B');
+INSERT INTO `evaluaciones_docentes` (`id`, `docente_id`, `director_id`, `puntaje`, `observaciones`, `fecha`) VALUES (1,1,1,5,'Excelente manejo de aula y uso del laboratorio de computo.','2026-03-02');
+INSERT INTO `evaluaciones_docentes` (`id`, `docente_id`, `director_id`, `puntaje`, `observaciones`, `fecha`) VALUES (2,1,1,4,'Cumple con la programacion establecida y sus clases son puntuales.','2026-04-02');
+INSERT INTO `evaluaciones_docentes` (`id`, `docente_id`, `director_id`, `puntaje`, `observaciones`, `fecha`) VALUES (3,2,1,4,'Buen manejo de los materiales de matematica.','2026-03-02');
+INSERT INTO `evaluaciones_docentes` (`id`, `docente_id`, `director_id`, `puntaje`, `observaciones`, `fecha`) VALUES (4,3,1,3,'Debe mejorar la evaluacion de tareas y la participacion de los estudiantes.','2026-03-07');
+INSERT INTO `evaluaciones_docentes` (`id`, `docente_id`, `director_id`, `puntaje`, `observaciones`, `fecha`) VALUES (5,4,1,5,'Docente incorporada con buena disposicion y dominio del aula.','2026-04-20');
+INSERT INTO `horarios` (`id`, `curso_id`, `dia`, `hora_inicio`, `hora_fin`, `aula`) VALUES (1,1,1,'07:00:00','08:30:00','A-201');
+INSERT INTO `horarios` (`id`, `curso_id`, `dia`, `hora_inicio`, `hora_fin`, `aula`) VALUES (2,1,3,'09:00:00','10:30:00','Lab-Computo');
+INSERT INTO `horarios` (`id`, `curso_id`, `dia`, `hora_inicio`, `hora_fin`, `aula`) VALUES (3,2,2,'07:00:00','08:30:00','A-201');
+INSERT INTO `horarios` (`id`, `curso_id`, `dia`, `hora_inicio`, `hora_fin`, `aula`) VALUES (4,2,4,'09:00:00','10:30:00','Lab-Computo');
+INSERT INTO `horarios` (`id`, `curso_id`, `dia`, `hora_inicio`, `hora_fin`, `aula`) VALUES (5,3,1,'09:00:00','10:30:00','B-102');
+INSERT INTO `horarios` (`id`, `curso_id`, `dia`, `hora_inicio`, `hora_fin`, `aula`) VALUES (6,3,5,'07:00:00','08:30:00','B-102');
+INSERT INTO `horarios` (`id`, `curso_id`, `dia`, `hora_inicio`, `hora_fin`, `aula`) VALUES (7,4,2,'09:00:00','10:30:00','A-103');
+INSERT INTO `horarios` (`id`, `curso_id`, `dia`, `hora_inicio`, `hora_fin`, `aula`) VALUES (8,4,4,'07:00:00','08:30:00','A-103');
+INSERT INTO `horarios` (`id`, `curso_id`, `dia`, `hora_inicio`, `hora_fin`, `aula`) VALUES (9,5,3,'07:00:00','08:30:00','A-104');
+INSERT INTO `horarios` (`id`, `curso_id`, `dia`, `hora_inicio`, `hora_fin`, `aula`) VALUES (10,5,5,'09:00:00','10:30:00','A-104');
+INSERT INTO `incidencias` (`id`, `estudiante_id`, `docente_id`, `tipo`, `descripcion`, `fecha`, `estado`, `respuesta_director`, `fecha_respuesta`) VALUES (1,2,1,'conducta','Discusion con companero durante el desarrollo de la clase.','2026-03-03','resuelta','Se converso con el tutor del aula. Comportamiento en mejora.','2026-03-04 09:15:00');
+INSERT INTO `incidencias` (`id`, `estudiante_id`, `docente_id`, `tipo`, `descripcion`, `fecha`, `estado`, `respuesta_director`, `fecha_respuesta`) VALUES (2,6,1,'asistencia','Ausencia injustificada por tres dias consecutivos.','2026-03-05','en_proceso',NULL,NULL);
+INSERT INTO `incidencias` (`id`, `estudiante_id`, `docente_id`, `tipo`, `descripcion`, `fecha`, `estado`, `respuesta_director`, `fecha_respuesta`) VALUES (3,11,2,'rendimiento','Bajo rendimiento en operaciones algebraicas; no entrega tareas.','2026-03-06','pendiente',NULL,NULL);
+INSERT INTO `incidencias` (`id`, `estudiante_id`, `docente_id`, `tipo`, `descripcion`, `fecha`, `estado`, `respuesta_director`, `fecha_respuesta`) VALUES (4,19,3,'conducta','Uso de celular en clase de forma reiterada.','2026-03-09','pendiente',NULL,NULL);
+INSERT INTO `incidencias` (`id`, `estudiante_id`, `docente_id`, `tipo`, `descripcion`, `fecha`, `estado`, `respuesta_director`, `fecha_respuesta`) VALUES (5,27,3,'otro','Entrego el trabajo de comunicacion con datos incompletos y fuera de fecha.','2026-03-11','resuelta','Se reprogramo la exposicion grupal.','2026-03-12 11:40:00');
+INSERT INTO `incidencias` (`id`, `estudiante_id`, `docente_id`, `tipo`, `descripcion`, `fecha`, `estado`, `respuesta_director`, `fecha_respuesta`) VALUES (6,7,1,'conducta','Uso reiterado del celular durante la clase de programacion.','2026-04-14','resuelta','Se notifico al tutor del aula y se acordo un seguimiento con la familia.','2026-10-11 19:34:33');
+INSERT INTO `mensajes` (`id`, `remitente_id`, `destinatario_id`, `destinatario_ugel_id`, `asunto`, `cuerpo`, `fecha`, `leido`) VALUES (1,2,1,NULL,'Solicitud de material para el laboratorio','Estimada senora, necesito un proyector adicional para el laboratorio de computo del 5to grado.','2026-03-10 08:20:00',1);
+INSERT INTO `mensajes` (`id`, `remitente_id`, `destinatario_id`, `destinatario_ugel_id`, `asunto`, `cuerpo`, `fecha`, `leido`) VALUES (2,3,1,NULL,'Reporte de asistencia de 6to A','Adjunto el detalle de asistencias de la semana del 6to grado A.','2026-03-11 10:05:00',1);
+INSERT INTO `mensajes` (`id`, `remitente_id`, `destinatario_id`, `destinatario_ugel_id`, `asunto`, `cuerpo`, `fecha`, `leido`) VALUES (3,1,2,NULL,'Respuesta sobre el horario de recuperacion','Por favor confirmar la clase de recuperacion del dia jueves a las 11:00 am.','2026-03-12 09:00:00',0);
+INSERT INTO `mensajes` (`id`, `remitente_id`, `destinatario_id`, `destinatario_ugel_id`, `asunto`, `cuerpo`, `fecha`, `leido`) VALUES (4,1,NULL,1,'Informe academico del periodo 2026-1','Adjuntamos el informe de gestion academica correspondiente al periodo 2026-1.','2026-03-13 10:30:00',0);
+INSERT INTO `mensajes` (`id`, `remitente_id`, `destinatario_id`, `destinatario_ugel_id`, `asunto`, `cuerpo`, `fecha`, `leido`) VALUES (5,2,1,NULL,'Solicitud de proyector','Necesito un proyector adicional para el aula de 5to A.','2026-10-11 20:14:00',0);
+INSERT INTO `mensajes` (`id`, `remitente_id`, `destinatario_id`, `destinatario_ugel_id`, `asunto`, `cuerpo`, `fecha`, `leido`) VALUES (6,1,NULL,1,'Informe academico 2026-1','Adjuntamos el informe de gestion academica del periodo 2026-1 para el informe correspondiente.','2026-10-11 20:42:36',0);
+INSERT INTO `mensajes` (`id`, `remitente_id`, `destinatario_id`, `destinatario_ugel_id`, `asunto`, `cuerpo`, `fecha`, `leido`) VALUES (7,1,3,NULL,'Felicitacion por su evaluacion','Su manejo de Lengua y Comunicacion fue destacado durante este bimestre.','2026-10-11 20:43:13',0);
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (1,1,'2026-03',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (2,1,'2026-04',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (3,1,'2026-05',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (4,1,'2026-06',350.00,'pendiente');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (5,1,'2026-07',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (6,2,'2026-03',350.00,'pendiente');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (7,2,'2026-04',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (8,2,'2026-05',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (9,2,'2026-06',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (10,2,'2026-07',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (11,3,'2026-03',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (12,3,'2026-04',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (13,3,'2026-05',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (14,3,'2026-06',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (15,3,'2026-07',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (16,4,'2026-03',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (17,4,'2026-04',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (18,4,'2026-05',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (19,4,'2026-06',350.00,'pendiente');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (20,4,'2026-07',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (21,5,'2026-03',350.00,'pendiente');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (22,5,'2026-04',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (23,5,'2026-05',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (24,5,'2026-06',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (25,5,'2026-07',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (26,6,'2026-03',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (27,6,'2026-04',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (28,6,'2026-05',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (29,6,'2026-06',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (30,6,'2026-07',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (31,7,'2026-03',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (32,7,'2026-04',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (33,7,'2026-05',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (34,7,'2026-06',350.00,'pendiente');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (35,7,'2026-07',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (36,8,'2026-03',350.00,'pendiente');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (37,8,'2026-04',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (38,8,'2026-05',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (39,8,'2026-06',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (40,8,'2026-07',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (41,9,'2026-03',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (42,9,'2026-04',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (43,9,'2026-05',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (44,9,'2026-06',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (45,9,'2026-07',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (46,10,'2026-03',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (47,10,'2026-04',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (48,10,'2026-05',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (49,10,'2026-06',350.00,'pendiente');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (50,10,'2026-07',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (51,11,'2026-03',350.00,'pendiente');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (52,11,'2026-04',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (53,11,'2026-05',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (54,11,'2026-06',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (55,11,'2026-07',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (56,12,'2026-03',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (57,12,'2026-04',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (58,12,'2026-05',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (59,12,'2026-06',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (60,12,'2026-07',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (61,13,'2026-03',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (62,13,'2026-04',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (63,13,'2026-05',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (64,13,'2026-06',350.00,'pendiente');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (65,13,'2026-07',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (66,14,'2026-03',350.00,'pendiente');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (67,14,'2026-04',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (68,14,'2026-05',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (69,14,'2026-06',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (70,14,'2026-07',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (71,15,'2026-03',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (72,15,'2026-04',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (73,15,'2026-05',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (74,15,'2026-06',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (75,15,'2026-07',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (76,16,'2026-03',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (77,16,'2026-04',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (78,16,'2026-05',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (79,16,'2026-06',350.00,'pendiente');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (80,16,'2026-07',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (81,17,'2026-03',350.00,'pendiente');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (82,17,'2026-04',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (83,17,'2026-05',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (84,17,'2026-06',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (85,17,'2026-07',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (86,18,'2026-03',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (87,18,'2026-04',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (88,18,'2026-05',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (89,18,'2026-06',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (90,18,'2026-07',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (91,19,'2026-03',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (92,19,'2026-04',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (93,19,'2026-05',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (94,19,'2026-06',350.00,'pendiente');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (95,19,'2026-07',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (96,20,'2026-03',350.00,'pendiente');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (97,20,'2026-04',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (98,20,'2026-05',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (99,20,'2026-06',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (100,20,'2026-07',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (101,21,'2026-03',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (102,21,'2026-04',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (103,21,'2026-05',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (104,21,'2026-06',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (105,21,'2026-07',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (106,22,'2026-03',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (107,22,'2026-04',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (108,22,'2026-05',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (109,22,'2026-06',350.00,'pendiente');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (110,22,'2026-07',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (111,23,'2026-03',350.00,'pendiente');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (112,23,'2026-04',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (113,23,'2026-05',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (114,23,'2026-06',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (115,23,'2026-07',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (116,24,'2026-03',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (117,24,'2026-04',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (118,24,'2026-05',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (119,24,'2026-06',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (120,24,'2026-07',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (121,25,'2026-03',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (122,25,'2026-04',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (123,25,'2026-05',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (124,25,'2026-06',350.00,'pendiente');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (125,25,'2026-07',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (126,26,'2026-03',350.00,'pendiente');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (127,26,'2026-04',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (128,26,'2026-05',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (129,26,'2026-06',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (130,26,'2026-07',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (131,27,'2026-03',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (132,27,'2026-04',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (133,27,'2026-05',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (134,27,'2026-06',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (135,27,'2026-07',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (136,28,'2026-03',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (137,28,'2026-04',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (138,28,'2026-05',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (139,28,'2026-06',350.00,'pendiente');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (140,28,'2026-07',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (141,29,'2026-03',350.00,'pendiente');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (142,29,'2026-04',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (143,29,'2026-05',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (144,29,'2026-06',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (145,29,'2026-07',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (146,30,'2026-03',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (147,30,'2026-04',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (148,30,'2026-05',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (149,30,'2026-06',350.00,'pagado');
+INSERT INTO `pagos` (`id`, `estudiante_id`, `mes`, `monto`, `estado`) VALUES (150,30,'2026-07',350.00,'pagado');
+INSERT INTO `parametros_economicos` (`id`, `pension_mensual`, `num_estudiantes`, `gastos_operativos`, `meses`, `actualizado_en`) VALUES (1,350.00,30,4500.00,5,'2026-10-12 00:43:13');
+INSERT INTO `plantillas_ugel` (`id`, `nombre`, `contenido_html`, `actualizado_en`) VALUES (1,'Oficio de informe de gestion academica','<h2 style=\"text-align:center\">OFICIO DE INFORME</h2>\n  <p><strong>Señor/a:</strong> Director(a) de la {{institucion}}</p>\n  <p><strong>Asunto:</strong> Informe de gestion academica del periodo lectivo {{periodo}}</p>\n  <p>Estimado(a) {{director}}, por medio de la presente remitimos el informe correspondiente al periodo indicado para su conocimiento y fines.</p>','2026-10-12 00:01:05');
+INSERT INTO `plantillas_ugel` (`id`, `nombre`, `contenido_html`, `actualizado_en`) VALUES (2,'Solicitud de apoyo para implementacion tecnologica','<h2 style=\"text-align:center\">SOLICITUD DE APOYO</h2>\n  <p><strong>Institucion:</strong> {{institucion}}</p>\n  <p><strong>Fecha:</strong> {{fecha}}</p>\n  <p>Estimado(a) {{director}}, solicitamos el apoyo pertinente para la mejora de los recursos tecnologicos de nuestra institucion.</p>','2026-10-12 00:01:05');
+INSERT INTO `roles` (`id`, `nombre`, `descripcion`) VALUES (1,'DOCENTE','Docente de aula: cursos, horarios, asistencia e incidencias');
+INSERT INTO `roles` (`id`, `nombre`, `descripcion`) VALUES (2,'DIRECTOR','Directivo: incidencias, evaluacion docente, cursos y economia');
+INSERT INTO `ugel_contactos` (`id`, `nombre`, `cargo`, `email`, `telefono`, `direccion`) VALUES (1,'UGEL Chiclayo','Oficina de Innovacion Educational','ugel.chiclayo@educacion.gob.pe','900333444','Av. Balta 1200, Chiclayo');
+INSERT INTO `usuarios` (`id`, `rol_id`, `usuario`, `password_hash`, `nombres`, `apellidos`, `email`, `telefono`, `foto`, `activo`, `creado_en`) VALUES (1,2,'director','$2y$10$nUpWPvS0MDNjJVBhnbhGaeR/5NfK0bjzH634G/2UTEFGX/FL/3HdW','Maria','Fernandez Caisa','director@sagradocorazon.edu.pe','900111222',NULL,1,'2026-10-12 00:01:05');
+INSERT INTO `usuarios` (`id`, `rol_id`, `usuario`, `password_hash`, `nombres`, `apellidos`, `email`, `telefono`, `foto`, `activo`, `creado_en`) VALUES (2,1,'docente','$2y$10$XvaNMh4LbsGN5C/.2YXLEebvNAqk.BeFgZKJ6GLdUjomPEWMqvlBO','Carlos','Quispe Rojas','cquispe@sagradocorazon.edu.pe','900222333',NULL,1,'2026-10-12 00:01:05');
+INSERT INTO `usuarios` (`id`, `rol_id`, `usuario`, `password_hash`, `nombres`, `apellidos`, `email`, `telefono`, `foto`, `activo`, `creado_en`) VALUES (3,1,'jramirez','$2y$10$XvaNMh4LbsGN5C/.2YXLEebvNAqk.BeFgZKJ6GLdUjomPEWMqvlBO','Lucia','Ramirez Diaz','lramirez@sagradocorazon.edu.pe','900222444',NULL,1,'2026-10-12 00:01:05');
+INSERT INTO `usuarios` (`id`, `rol_id`, `usuario`, `password_hash`, `nombres`, `apellidos`, `email`, `telefono`, `foto`, `activo`, `creado_en`) VALUES (4,1,'mflores','$2y$10$XvaNMh4LbsGN5C/.2YXLEebvNAqk.BeFgZKJ6GLdUjomPEWMqvlBO','Jorge','Flores Aguilar','jflores@sagradocorazon.edu.pe','900222555',NULL,1,'2026-10-12 00:01:05');
+INSERT INTO `usuarios` (`id`, `rol_id`, `usuario`, `password_hash`, `nombres`, `apellidos`, `email`, `telefono`, `foto`, `activo`, `creado_en`) VALUES (5,1,'ralvarado52','$2y$10$1G8Lsn6a6ORCatD6BpjPA.hoZXQzS5XgDVCDWYbMuX5DFO.hHZvMO','Rosa','Alvarado Medina','ralvarado@sagradocorazon.edu.pe','900555666',NULL,1,'2026-10-12 00:33:54');

@@ -25,6 +25,8 @@ final class Respuesta
             http_response_code($codigo);
             header('Content-Type: application/json; charset=utf-8');
             header('X-Content-Type-Options: nosniff');
+            header('X-Frame-Options: SAMEORIGIN');
+            header('Cache-Control: no-store');
         }
 
         echo json_encode(

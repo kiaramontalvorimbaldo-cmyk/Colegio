@@ -27,8 +27,12 @@ final class Plantilla extends ModeloBase
         }
 
         $contenido = (string)$plantilla['contenido_html'];
+
+        // El documento se muestra en la pantalla: se retiran scripts y manejadores.
+        $contenido = self::sanear($contenido);
+
         foreach ($datos as $marcador => $valor) {
-            $contenido = str_replace('{{' . $marcador . '}}', (string)$valor, $contenido);
+            $contenido = str_replace('{{' . $marcador . '}}', htmlspecialchars((string)$valor, ENT_QUOTES), $contenido);
         }
 
         $restantes = [];
@@ -39,5 +43,15 @@ final class Plantilla extends ModeloBase
         $plantilla['contenido_html'] = $contenido;
         $plantilla['marcadores_pendientes'] = $restantes;
         return $plantilla;
+    }
+
+    /** Elimina scripts, estilos y manejadores de evento del HTML de la plantilla. */
+    private static function sanear(string $html): string
+    {
+        $html = preg_replace('#<\s*(script|style|iframe|object|embed)\b[^>]*>.*?<\s*/\s*\1\s*>#is', '', $html);
+        $html = preg_replace('#<\s*(script|style|iframe|object|embed)\b[^>]*/?>#is', '', (string)$html);
+        $html = preg_replace('#\son[a-z]+\s*=\s*("[^"]*"|\'[^\']*\'|[^\s>]+)#i', '', (string)$html);
+        $html = preg_replace('#(href|src)\s*=\s*("|\')?\s*javascript:[^"\'>\s]*("|\')?#i', '', (string)$html);
+        return (string)$html;
     }
 }
