@@ -1,0 +1,190 @@
+/* =====================================================================
+   Sistema de Administracion Academica - I.E.P. Sagrado Corazon de Jesus
+   Hoja base: variables, layout de panel, componentes y responsive.
+   ===================================================================== */
+
+:root{
+  --azul:#16305c;
+  --azul-2:#1f4079;
+  --azul-claro:#2c4f86;
+  --fondo:#f2f5fa;
+  --blanco:#ffffff;
+  --texto:#1f2937;
+  --gris:#6b7280;
+  --borde:#e5e7eb;
+  --verde:#16a34a;
+  --rojo:#dc2626;
+  --ambar:#d97706;
+  --sombra:0 4px 16px rgba(22,48,92,.08);
+  --radio:10px;
+  --lateral:250px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+body{
+  font-family:"Segoe UI",Roboto,Arial,sans-serif;
+  background:var(--fondo);color:var(--texto);font-size:15px;line-height:1.5;
+}
+
+a{text-decoration:none;color:inherit}
+ul{list-style:none}
+svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+
+/* ------------------------------------------------------------- login */
+.login{background:linear-gradient(135deg,var(--azul),#0e2244)}
+.login-caja{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;
+}
+.login-tarjeta{
+  background:var(--blanco);width:100%;max-width:400px;padding:34px 32px;
+  border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,.28);
+}
+.login-logo{
+  width:60px;height:60px;margin:0 auto 14px;border-radius:50%;
+  background:var(--azul);color:#fff;display:flex;align-items:center;justify-content:center;
+}
+.login-logo svg{width:30px;height:30px}
+.login-tarjeta h1{font-size:1.05rem;color:var(--azul);text-align:center}
+.login-tarjeta .subtitulo{font-size:.82rem;color:var(--gris);text-align:center;margin:4px 0 22px}
+.demo{
+  margin-top:20px;padding:10px 12px;background:#eef3fb;border:1px dashed var(--azul-claro);
+  border-radius:8px;font-size:.78rem;color:var(--azul-2);
+}
+.demo b{display:block;margin-bottom:4px}
+
+/* ------------------------------------------------------------ layout */
+.app{display:flex;min-height:100vh}
+
+.lateral{
+  width:var(--lateral);background:var(--azul);color:#cfd9ea;
+  display:flex;flex-direction:column;position:fixed;top:0;bottom:0;left:0;
+}
+.lateral-marca{
+  display:flex;align-items:center;gap:10px;padding:18px 16px;
+  border-bottom:1px solid rgba(255,255,255,.12);color:#fff;
+}
+.lateral-marca svg{width:26px;height:26px}
+.lateral-marca strong{display:block;font-size:.86rem;line-height:1.2}
+.lateral-marca span{font-size:.7rem;color:#9db2d4}
+
+.menu{padding:12px 10px;overflow-y:auto;flex:1}
+.menu-titulo{
+  font-size:.68rem;letter-spacing:.09em;text-transform:uppercase;
+  color:#7f95bd;padding:14px 10px 6px;
+}
+.menu a{
+  display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:8px;
+  font-size:.88rem;margin-bottom:3px;
+}
+.menu a:hover{background:var(--azul-2);color:#fff}
+.menu a.activo{background:var(--azul-claro);color:#fff;font-weight:600}
+.menu .sprint{
+  margin-left:auto;font-size:.62rem;background:rgba(255,255,255,.12);
+  padding:2px 6px;border-radius:5px;color:#c3d2ea;
+}
+
+.lateral-pie{
+  padding:12px 16px;border-top:1px solid rgba(255,255,255,.12);
+  font-size:.72rem;color:#9db2d4;
+}
+
+.principal{margin-left:var(--lateral);flex:1;display:flex;flex-direction:column;min-width:0}
+
+.cabecera{
+  background:var(--blanco);border-bottom:1px solid var(--borde);
+  padding:12px 24px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:5;
+}
+.cabecera h2{font-size:1.05rem;color:var(--azul);margin-right:auto}
+.buscador{display:flex;align-items:center;gap:8px;background:var(--fondo);
+  border:1px solid var(--borde);border-radius:8px;padding:7px 12px}
+.buscador input{border:0;background:transparent;outline:none;font-size:.85rem;width:180px}
+
+.perfil{display:flex;align-items:center;gap:10px}
+.avatar{
+  width:38px;height:38px;border-radius:50%;background:var(--azul-claro);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem;
+}
+.avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.perfil-datos{line-height:1.25}
+.perfil-datos strong{display:block;font-size:.84rem}
+.perfil-datos span{font-size:.72rem;color:var(--gris)}
+
+.contenido{padding:22px 24px;flex:1}
+
+/* -------------------------------------------------------- componentes */
+.tarjeta{
+  background:var(--blanco);border:1px solid var(--borde);border-radius:var(--radio);
+  padding:18px;box-shadow:var(--sombra);
+}
+.tarjeta h3{font-size:.95rem;color:var(--azul);margin-bottom:4px}
+.tarjeta p{font-size:.85rem;color:var(--gris)}
+
+.rejilla{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+.rejilla.dos{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+
+.indicador{display:flex;align-items:center;gap:14px}
+.indicador .icono{
+  width:46px;height:46px;border-radius:10px;background:#eef3fb;color:var(--azul-claro);
+  display:flex;align-items:center;justify-content:center;
+}
+.indicador .icono svg{width:22px;height:22px}
+.indicador .valor{font-size:1.5rem;font-weight:700;color:var(--azul)}
+.indicador .etiqueta{font-size:.78rem;color:var(--gris)}
+
+.boton{
+  display:inline-flex;align-items:center;gap:7px;border:0;cursor:pointer;
+  padding:9px 16px;border-radius:8px;font-size:.86rem;font-weight:600;
+  background:var(--azul-claro);color:#fff;transition:background .15s;
+}
+.boton:hover{background:var(--azul)}
+.boton.secundario{background:var(--blanco);color:var(--azul);border:1px solid var(--borde)}
+.boton.peligro{background:var(--rojo)}
+.boton:disabled{opacity:.6;cursor:not-allowed}
+
+table{width:100%;border-collapse:collapse;font-size:.86rem}
+th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--borde)}
+th{background:#f8fafc;color:var(--azul);font-size:.76rem;text-transform:uppercase;letter-spacing:.04em}
+tbody tr:hover{background:#f8fafc}
+
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:600}
+.badge.verde{background:#dcfce7;color:#15803d}
+.badge.rojo{background:#fee2e2;color:#b91c1c}
+.badge.ambar{background:#fef3c7;color:#b45309}
+.badge.azul{background:#e0e9f7;color:var(--azul)}
+
+.campo{margin-bottom:14px}
+.campo label{display:block;font-size:.8rem;font-weight:600;color:var(--gris);margin-bottom:5px}
+.campo input,.campo select,.campo textarea{
+  width:100%;padding:10px 12px;border:1px solid var(--borde);border-radius:8px;
+  font-size:.9rem;font-family:inherit;background:var(--blanco);color:var(--texto);
+}
+.campo input:focus,.campo select:focus,.campo textarea:focus{
+  outline:none;border-color:var(--azul-claro);box-shadow:0 0 0 3px rgba(44,79,134,.14);
+}
+.campo.error input{border-color:var(--rojo)}
+.campo .texto-error{font-size:.75rem;color:var(--rojo);margin-top:4px;display:none}
+.campo.error .texto-error{display:block}
+
+.alerta{
+  padding:11px 14px;border-radius:8px;font-size:.85rem;margin-bottom:14px;display:none;
+}
+.alerta.visible{display:block}
+.alerta.error{background:#fee2e2;color:#b91c1c;border:1px solid #fca5a5}
+.alerta.ok{background:#dcfce7;color:#15803d;border:1px solid #86efac}
+
+.vacio{text-align:center;color:var(--gris);padding:26px;font-size:.88rem}
+.escondido{display:none}
+
+/* --------------------------------------------------------- responsive */
+@media (max-width:900px){
+  .app{flex-direction:column}
+  .lateral{position:static;width:100%;flex-direction:column}
+  .menu{display:flex;overflow-x:auto;padding:8px}
+  .menu-titulo{display:none}
+  .menu a{white-space:nowrap;margin:0 4px 0 0}
+  .lateral-pie{display:none}
+  .principal{margin-left:0}
+  .buscador input{width:110px}
+  .perfil-datos{display:none}
+}

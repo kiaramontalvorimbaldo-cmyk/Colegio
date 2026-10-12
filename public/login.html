@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Iniciar sesion - I.E.P. Sagrado Corazon de Jesus</title>
+<link rel="stylesheet" href="assets/css/estilos.css">
+</head>
+<body class="login">
+<div class="login-caja">
+  <main class="login-tarjeta">
+    <div class="login-logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+           stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/>
+      </svg>
+    </div>
+    <h1>Sistema de Administracion Academica</h1>
+    <p class="subtitulo">I.E.P. Sagrado Corazon de Jesus &middot; Chiclayo</p>
+
+    <div id="alerta" class="alerta"></div>
+
+    <form id="formulario" novalidate>
+      <div class="campo" id="campo-usuario">
+        <label for="usuario">Usuario</label>
+        <input type="text" id="usuario" name="usuario" placeholder="Ej. docente" autocomplete="username">
+        <span class="texto-error">Ingrese un usuario valido</span>
+      </div>
+
+      <div class="campo" id="campo-clave">
+        <label for="clave">Contrasena</label>
+        <input type="password" id="clave" name="clave" placeholder="Minimo 6 caracteres" autocomplete="current-password">
+        <span class="texto-error">Ingrese su contrasena</span>
+      </div>
+
+      <button type="submit" class="boton" id="btn-entrar" style="width:100%;justify-content:center">
+        Ingresar al sistema
+      </button>
+    </form>
+
+    <div class="demo">
+      <b>Cuentas de prueba</b>
+      Director: director / Director123*<br>
+      Docente: docente / Docente123*
+    </div>
+  </main>
+</div>
+
+<script type="module" src="assets/js/login.js"></script>
+</body>
+</html>

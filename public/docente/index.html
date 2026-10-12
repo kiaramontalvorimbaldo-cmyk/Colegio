@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Docencia - Sagrado Corazon de Jesus</title>
+<link rel="stylesheet" href="../assets/css/estilos.css">
+</head>
+<body>
+<div class="app" id="app"></div>
+
+<script type="module">
+import { iniciarPanel, bloqueProvisional, svg } from '../assets/js/layout.js';
+import { escapar } from '../assets/js/ui.js';
+
+iniciarPanel('DOCENTE', (contenedor, usuario) => {
+  contenedor.innerHTML = `
+    <div class="tarjeta" style="margin-bottom:16px">
+      <h3>Bienvenido(a), ${escapar(usuario.nombres)} ${escapar(usuario.apellidos)}</h3>
+      <p>Sesion iniciada como <span class="badge azul">DOCENTE</span> - usuario: ${escapar(usuario.usuario)}</p>
+    </div>
+    <div class="rejilla">
+      <div class="indicador tarjeta">
+        <div class="icono">${svg('cursos')}</div>
+        <div><div class="valor">-</div><div class="etiqueta">Cursos asignados</div></div>
+      </div>
+      <div class="indicador tarjeta">
+        <div class="icono">${svg('asistencia')}</div>
+        <div><div class="valor">-</div><div class="etiqueta">Asistencia del dia</div></div>
+      </div>
+      <div class="indicador tarjeta">
+        <div class="icono">${svg('incidencias')}</div>
+        <div><div class="valor">-</div><div class="etiqueta">Incidencias pendientes</div></div>
+      </div>
+    </div>
+    <div style="margin-top:16px">
+      ${bloqueProvisional('Modulos del docente', 'Perfil, cursos, horario, mensajes, asistencia, incidencias y reportes se habilitan en los siguientes sprints.', 'Sprint 3 y 4')}
+    </div>`;
+});
+</script>
+</body>
+</html>

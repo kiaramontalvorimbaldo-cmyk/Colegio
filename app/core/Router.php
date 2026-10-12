@@ -7,10 +7,11 @@ declare(strict_types=1);
  */
 final class Router
 {
-    /** @var array<int, array{metodo:string, patron:string, ruta:string, control:string}> */
+    /** @var array<int, array{metodo:string, patron:string, ruta:string, control:string, roles:array}> */
     private array $rutas = [];
 
-    public function agregar(string $metodo, string $ruta, string $controlador, string $accion): self
+    /** @param string[] $roles Roles autorizados; vacio = ruta publica */
+    public function agregar(string $metodo, string $ruta, string $controlador, string $accion, array $roles = []): self
     {
         $ruta = '/' . trim($ruta, '/');
         $patron = preg_quote($ruta, '#');
@@ -21,6 +22,7 @@ final class Router
             'patron'  => '#^' . $patron . '$#',
             'ruta'    => $ruta,
             'control' => $controlador . '@' . $accion,
+            'roles'   => $roles,
         ];
         return $this;
     }
@@ -46,6 +48,9 @@ final class Router
             }
 
             [$clase, $accion] = explode('@', $item['control']);
+            if ($item['roles'] !== []) {
+                Auth::exigirRol(...$item['roles']); // middleware de roles
+            }
             $controlador = new $clase();
             $controlador->$accion(...$args);
             return;

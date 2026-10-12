@@ -1,11 +1,61 @@
-### Sprint 1 - Nucleo MVC y base de datos
+### Pruebas de la API - Sistema de Administracion Academica
 # URL base de la API (ajustar el puerto si Apache no escucha en 80)
 @base = http://localhost:8080/sagrado-corazon/api
 
-### Comprobacion del servicio y de la conexion unica (Singleton)
+### Sprint 1: estado del servicio y conexion unica
 GET {{base}}/salud
 Accept: application/json
 
 ### Ruta inexistente -> 404
 GET {{base}}/no-existe
+Accept: application/json
+
+### ---------------- AUTENTICACION (Sprint 2) ----------------
+
+### Sin sesion -> 401
+GET {{base}}/auth/yo
+Accept: application/json
+
+### Credenciales incorrectas -> 400
+POST {{base}}/auth/login
+Content-Type: application/json
+
+{
+  "usuario": "director",
+  "clave": "claveIncorrecta"
+}
+
+### Login del director -> 200 (guarda la cookie de sesion)
+POST {{base}}/auth/login
+Content-Type: application/json
+
+{
+  "usuario": "director",
+  "clave": "Director123*"
+}
+
+### Sesion activa -> 200
+GET {{base}}/auth/yo
+Accept: application/json
+
+### Director en ruta de docente -> 403
+GET {{base}}/pruebas/permiso-docente
+Accept: application/json
+
+### Cerrar sesion -> 200
+POST {{base}}/auth/logout
+
+### ---------------- DOCENTE (Sprint 2 en adelante) ----------------
+
+### Login del docente (docente / Docente123*)
+POST {{base}}/auth/login
+Content-Type: application/json
+
+{
+  "usuario": "docente",
+  "clave": "Docente123*"
+}
+
+### Docente en ruta de director -> 403
+GET {{base}}/pruebas/permiso-director
 Accept: application/json
