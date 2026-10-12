@@ -32,7 +32,9 @@ export function graficoBarras(idCanvas, etiquetas, datos, opciones = {}) {
         tooltip: { callbacks: { label: (c) => `${c.parsed.y}${opciones.sufijo ?? '%'}` } },
       },
       scales: {
-        y: { beginAtZero: true, max: 100, ticks: { callback: (v) => v + (opciones.sufijo ?? '%') } },
+        y: opciones.conteos
+          ? { beginAtZero: true, ticks: { precision: 0 } }
+          : { beginAtZero: true, max: 100, ticks: { callback: (v) => v + (opciones.sufijo ?? '%') } },
       },
     },
   });

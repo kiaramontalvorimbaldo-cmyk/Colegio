@@ -64,8 +64,24 @@ $router->agregar('GET',  'docente/estudiantes', DocenteController::class,  'estu
 $router->agregar('GET',  'docente/reportes',    DocenteController::class,  'reportes',    ['DOCENTE']);
 $router->agregar('GET',  'asistencias',         AsistenciaController::class, 'index',     ['DOCENTE']);
 $router->agregar('POST', 'asistencias',         AsistenciaController::class, 'crear',     ['DOCENTE']);
-$router->agregar('GET',  'incidencias',         IncidenciaController::class,  'index',     ['DOCENTE']);
+$router->agregar('GET',  'incidencias',         IncidenciaController::class,  'index',     ['DOCENTE', 'DIRECTOR']);
 $router->agregar('POST', 'incidencias',         IncidenciaController::class,  'crear',     ['DOCENTE']);
+$router->agregar('PUT',  'incidencias/{id}',    IncidenciaController::class,  'actualizar', ['DIRECTOR']);
+
+// Modulos de la direccion (Sprint 5)
+$router->agregar('GET',    'director/resumen', DirectorController::class,  'resumen',    ['DIRECTOR']);
+$router->agregar('GET',    'docentes',         DocentesController::class,  'index',      ['DIRECTOR']);
+$router->agregar('POST',   'docentes',         DocentesController::class,  'crear',      ['DIRECTOR']);
+$router->agregar('GET',    'evaluaciones',     EvaluacionController::class, 'index',     ['DIRECTOR']);
+$router->agregar('POST',   'evaluaciones',     EvaluacionController::class, 'crear',     ['DIRECTOR']);
+$router->agregar('GET',    'cursos',           CursoController::class,     'index',     ['DIRECTOR']);
+$router->agregar('POST',   'cursos',           CursoController::class,     'crear',     ['DIRECTOR']);
+$router->agregar('PUT',    'cursos/{id}',      CursoController::class,     'actualizar', ['DIRECTOR']);
+$router->agregar('DELETE', 'cursos/{id}',      CursoController::class,     'borrar',    ['DIRECTOR']);
+$router->agregar('GET',    'horarios',         HorarioController::class,   'index',     ['DIRECTOR']);
+$router->agregar('POST',   'horarios',         HorarioController::class,   'crear',     ['DIRECTOR']);
+$router->agregar('PUT',    'horarios/{id}',    HorarioController::class,   'actualizar', ['DIRECTOR']);
+$router->agregar('DELETE', 'horarios/{id}',    HorarioController::class,   'borrar',    ['DIRECTOR']);
 
 // Mensajeria entre docentes y direccion
 $router->agregar('GET',  'mensajes', MensajeController::class, 'index',  ['DOCENTE', 'DIRECTOR']);

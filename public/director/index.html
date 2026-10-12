@@ -8,34 +8,67 @@
 </head>
 <body>
 <div class="app" id="app"></div>
+<script src="../assets/js/chart.umd.min.js"></script>
 
 <script type="module">
-import { iniciarPanel, bloqueProvisional, svg } from '../assets/js/layout.js';
+import { iniciarPanel, svg } from '../assets/js/layout.js';
+import { api } from '../assets/js/api.js';
+import { graficoAnillo, graficoBarras } from '../assets/js/graficos.js';
 import { escapar } from '../assets/js/ui.js';
 
-iniciarPanel('DIRECTOR', (contenedor, usuario) => {
+iniciarPanel('DIRECTOR', async (contenedor, usuario) => {
+  const r = await api('director/resumen');
+  if (!r.ok) { contenedor.innerHTML = `<div class="alerta visible error">${escapar(r.mensaje)}</div>`; return; }
+
+  const d = r.datos;
+  const i = d.incidencias;
+
   contenedor.innerHTML = `
     <div class="tarjeta" style="margin-bottom:16px">
       <h3>Bienvenido(a), ${escapar(usuario.nombres)} ${escapar(usuario.apellidos)}</h3>
-      <p>Sesion iniciada como <span class="badge azul">DIRECTOR</span> - usuario: ${escapar(usuario.usuario)}</p>
+      <p>Panel general de la direccion &middot; periodo 2026-1</p>
     </div>
-    <div class="rejilla">
+
+    <div class="rejilla" style="margin-bottom:16px">
       <div class="indicador tarjeta">
         <div class="icono">${svg('incidencias')}</div>
-        <div><div class="valor">-</div><div class="etiqueta">Incidencias por atender</div></div>
+        <div><div class="valor">${i.pendientes}</div><div class="etiqueta">Incidencias pendientes</div></div>
       </div>
       <div class="indicador tarjeta">
         <div class="icono">${svg('docentes')}</div>
-        <div><div class="valor">-</div><div class="etiqueta">Docentes registrados</div></div>
+        <div><div class="valor">${d.docentes}</div><div class="etiqueta">Docentes</div></div>
       </div>
       <div class="indicador tarjeta">
-        <div class="icono">${svg('economia')}</div>
-        <div><div class="valor">-</div><div class="etiqueta">Recaudacion del mes</div></div>
+        <div class="icono">${svg('cursos')}</div>
+        <div><div class="valor">${d.cursos}</div><div class="etiqueta">Cursos programados</div></div>
+      </div>
+      <div class="indicador tarjeta">
+        <div class="icono">${svg('asistencia')}</div>
+        <div><div class="valor">${d.asistencia_promedio}%</div><div class="etiqueta">Asistencia promedio</div></div>
       </div>
     </div>
-    <div style="margin-top:16px">
-      ${bloqueProvisional('Modulos de la direccion', 'Incidencias, evaluacion docente, altas de docentes, cursos, horarios, UGEL, plantillas y economia se habilitan en los siguientes sprints.', 'Sprint 5 y 6')}
+
+    <div class="rejilla dos">
+      <div class="tarjeta">
+        <h3>Incidencias por estado</h3>
+        <p>${i.total} incidencias registradas en el periodo.</p>
+        <div class="grafico"><canvas id="grafico-incidencias"></canvas></div>
+      </div>
+      <div class="tarjeta">
+        <h3>Seguimiento del ciclo</h3>
+        <p>${i.resueltas} resueltas &middot; ${i.proceso} en proceso &middot; ${i.pendientes} pendientes</p>
+        <div class="grafico"><canvas id="grafico-ciclo"></canvas></div>
+      </div>
     </div>`;
+
+  graficoAnillo('grafico-incidencias',
+    ['Pendiente', 'En proceso', 'Resuelta'],
+    [i.pendientes, i.proceso, i.resueltas]);
+
+  graficoBarras('grafico-ciclo',
+    ['Pendiente', 'En proceso', 'Resuelta'],
+    [i.pendientes, i.proceso, i.resueltas],
+    { etiqueta: 'Incidencias', conteos: true });
 });
 </script>
 </body>

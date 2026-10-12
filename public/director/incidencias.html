@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Incidencias - Direccion</title>
+<link rel="stylesheet" href="../assets/css/estilos.css">
+</head>
+<body>
+<div class="app" id="app"></div>
+
+<script type="module">
+import { iniciarPanel } from '../assets/js/layout.js';
+import { api } from '../assets/js/api.js';
+import { pintarTabla, badge } from '../assets/js/tabla.js';
+import { escapar, formatoFecha, mostrarAlerta } from '../assets/js/ui.js';
+
+const COLOR = { pendiente: 'ambar', en_proceso: 'azul', resuelta: 'verde' };
+
+iniciarPanel('DIRECTOR', async (contenedor) => {
+  contenedor.innerHTML = `
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+      <h3 style="margin-right:auto">Incidencias de la institucion</h3>
+      <div class="campo" style="margin:0;min-width:190px">
+        <select id="filtro">
+          <option value="">Todos los estados</option>
+          <option value="pendiente">Pendiente</option>
+          <option value="en_proceso">En proceso</option>
+          <option value="resuelta">Resuelta</option>
+        </select>
+      </div>
+    </div>
+    <div class="alerta" id="alerta"></div>
+    <div id="tabla"></div>
+
+    <div class="overlay" id="overlay">
+      <div class="modal">
+        <h3>Gestionar incidencia</h3>
+        <div class="alerta" id="alerta-modal"></div>
+        <div id="detalle"></div>
+        <form id="formulario">
+          <div class="campo"><label for="estado">Estado</label>
+            <select id="estado">
+              <option value="pendiente">Pendiente</option>
+              <option value="en_proceso">En proceso</option>
+              <option value="resuelta">Resuelta</option>
+            </select></div>
+          <div class="campo"><label for="respuesta">Respuesta del director</label>
+            <textarea id="respuesta" rows="4" maxlength="1000"
+                      placeholder="Escriba la respuesta para el docente"></textarea></div>
+          <div class="modal-acciones">
+            <button type="button" class="boton secundario" id="cancelar">Cancelar</button>
+            <button type="submit" class="boton">Guardar cambios</button>
+          </div>
+        </form>
+      </div>
+    </div>`;
+
+  const tabla = document.getElementById('tabla');
+  const alerta = document.getElementById('alerta');
+  const overlay = document.getElementById('overlay');
+  let actual = null;
+
+  async function cargar() {
+    const r = await api('incidencias', { params: { estado: document.getElementById('filtro').value } });
+    if (!r.ok) { mostrarAlerta(alerta, r.mensaje); return; }
+
+    pintarTabla(tabla, [
+      { titulo: 'Estudiante', render: (i) => `<strong>${escapar(i.nombres)} ${escapar(i.apellidos)}</strong><br>
+        <small style="color:var(--gris)">${escapar(i.grado)} - ${escapar(i.seccion)}</small>` },
+      { titulo: 'Docente', render: (i) => `${escapar(i.docente_nombres)} ${escapar(i.docente_apellidos)}` },
+      { titulo: 'Tipo', render: (i) => badge(i.tipo, 'azul') },
+      { titulo: 'Descripcion', render: (i) => escapar(i.descripcion) },
+      { titulo: 'Fecha', render: (i) => formatoFecha(i.fecha) },
+      { titulo: 'Estado', render: (i) => badge(i.estado, COLOR[i.estado] ?? 'azul') },
+      { titulo: 'Acciones', render: (i) => `<button class="boton secundario" data-gestionar="${i.id}">Gestionar</button>` },
+    ], r.datos, 'No hay incidencias con ese filtro');
+
+    tabla.querySelectorAll('[data-gestionar]').forEach((boton) => {
+      boton.addEventListener('click', () => abrir(r.datos.find((i) => String(i.id) === boton.dataset.gestionar)));
+    });
+  }
+
+  function abrir(incidencia) {
+    actual = incidencia;
+    mostrarAlerta(document.getElementById('alerta-modal'), '');
+    document.getElementById('detalle').innerHTML = `
+      <p><strong>${escapar(incidencia.nombres)} ${escapar(incidencia.apellidos)}</strong>
+      &middot; ${escapar(incidencia.grado)}-${escapar(incidencia.seccion)}</p>
+      <p style="font-size:.85rem;color:var(--gris);margin-bottom:12px">${escapar(incidencia.descripcion)}</p>`;
+    document.getElementById('estado').value = incidencia.estado;
+    document.getElementById('respuesta').value = incidencia.respuesta_director ?? '';
+    overlay.classList.add('visible');
+  }
+
+  document.getElementById('cancelar').addEventListener('click', () => overlay.classList.remove('visible'));
+
+  document.getElementById('formulario').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const r = await api(`incidencias/${actual.id}`, {
+      metodo: 'PUT',
+      cuerpo: {
+        estado: document.getElementById('estado').value,
+        respuesta_director: document.getElementById('respuesta').value.trim(),
+      },
+    });
+
+    if (!r.ok) { mostrarAlerta(document.getElementById('alerta-modal'), r.mensaje); return; }
+
+    overlay.classList.remove('visible');
+    mostrarAlerta(alerta, r.mensaje, 'ok');
+    cargar();
+  });
+
+  document.getElementById('filtro').addEventListener('change', cargar);
+  await cargar();
+});
+</script>
+</body>
+</html>

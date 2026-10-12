@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Horarios - Direccion</title>
+<link rel="stylesheet" href="../assets/css/estilos.css">
+</head>
+<body>
+<div class="app" id="app"></div>
+
+<script type="module">
+import { iniciarPanel } from '../assets/js/layout.js';
+import { api } from '../assets/js/api.js';
+import { pintarTabla, badge } from '../assets/js/tabla.js';
+import { escapar, mostrarAlerta } from '../assets/js/ui.js';
+
+const DIAS = [[1, 'Lunes'], [2, 'Martes'], [3, 'Miercoles'], [4, 'Jueves'], [5, 'Viernes'], [6, 'Sabado'], [7, 'Domingo']];
+
+iniciarPanel('DIRECTOR', async (contenedor) => {
+  const rc = await api('cursos');
+
+  contenedor.innerHTML = `
+    <h3 style="margin-bottom:14px">Gestion de horarios</h3>
+    <p style="color:var(--gris);font-size:.86rem;margin-bottom:14px">
+      El sistema rechaza los cruces: un docente no puede tener dos clases ni el aula puede estar ocupada en el mismo rango horario.</p>
+    <div class="alerta" id="alerta"></div>
+
+    <div class="tarjeta" style="margin-bottom:16px">
+      <h3 id="titulo-form" style="margin-bottom:12px">Nuevo horario</h3>
+      <form id="formulario">
+        <input type="hidden" id="id">
+        <div class="rejilla dos">
+          <div>
+            <div class="campo"><label for="curso_id">Curso</label>
+              <select id="curso_id" required>
+                ${(rc.datos ?? []).map((c) => `<option value="${c.id}">${escapar(c.nombre)} - ${escapar(c.grado)} ${escapar(c.seccion)} (${escapar(c.docente_nombres ?? '')})</option>`).join('')}
+              </select></div>
+            <div class="campo"><label for="dia">Dia</label>
+              <select id="dia" required>${DIAS.map(([v, t]) => `<option value="${v}">${t}</option>`).join('')}</select></div>
+            <div class="campo"><label for="aula">Aula</label>
+              <input type="text" id="aula" required placeholder="Ej. A-201"></div>
+          </div>
+          <div>
+            <div class="campo"><label for="hora_inicio">Hora de inicio</label>
+              <input type="time" id="hora_inicio" required value="07:00"></div>
+            <div class="campo"><label for="hora_fin">Hora de fin</label>
+              <input type="time" id="hora_fin" required value="08:30"></div>
+            <div>
+              <button class="boton" type="submit" id="guardar">Registrar horario</button>
+              <button class="boton secundario" type="button" id="limpiar">Limpiar</button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div id="tabla"></div>`;
+
+  const tabla = document.getElementById('tabla');
+  const alerta = document.getElementById('alerta');
+  let horarios = [];
+
+  async function cargar() {
+    const r = await api('horarios');
+    if (!r.ok) { mostrarAlerta(alerta, r.mensaje); return; }
+    horarios = r.datos;
+
+    pintarTabla(tabla, [
+      { titulo: 'Dia', render: (h) => badge(DIAS.find(([v]) => v === Number(h.dia))?.[1] ?? h.dia, 'azul') },
+      { titulo: 'Horario', render: (h) => `${escapar(String(h.hora_inicio).slice(0, 5))} - ${escapar(String(h.hora_fin).slice(0, 5))}` },
+      { titulo: 'Curso', render: (h) => `<strong>${escapar(h.curso)}</strong><br>
+        <small style="color:var(--gris)">${escapar(h.grado)} - ${escapar(h.seccion)}</small>` },
+      { titulo: 'Docente', render: (h) => `${escapar(h.docente_nombres)} ${escapar(h.docente_apellidos)}` },
+      { titulo: 'Aula', render: (h) => badge(h.aula, 'verde') },
+      { titulo: 'Acciones', render: (h) => `
+          <button class="boton secundario" data-editar="${h.id}">Editar</button>
+          <button class="boton peligro" data-borrar="${h.id}">Eliminar</button>` },
+    ], horarios, 'No hay horarios registrados');
+
+    tabla.querySelectorAll('[data-editar]').forEach((b) => b.addEventListener('click', () => editar(horarios.find((h) => String(h.id) === b.dataset.editar))));
+    tabla.querySelectorAll('[data-borrar]').forEach((b) => b.addEventListener('click', () => borrar(b.dataset.borrar)));
+  }
+
+  function editar(horario) {
+    document.getElementById('id').value = horario.id;
+    document.getElementById('curso_id').value = horario.curso_id;
+    document.getElementById('dia').value = horario.dia;
+    document.getElementById('hora_inicio').value = String(horario.hora_inicio).slice(0, 5);
+    document.getElementById('hora_fin').value = String(horario.hora_fin).slice(0, 5);
+    document.getElementById('aula').value = horario.aula;
+    document.getElementById('titulo-form').textContent = 'Editando horario';
+    document.getElementById('guardar').textContent = 'Actualizar horario';
+  }
+
+  async function borrar(id) {
+    if (!confirm('Eliminar este horario?')) return;
+    const r = await api(`horarios/${id}`, { metodo: 'DELETE' });
+    mostrarAlerta(alerta, r.mensaje, r.ok ? 'ok' : 'error');
+    if (r.ok) cargar();
+  }
+
+  document.getElementById('limpiar').addEventListener('click', () => {
+    document.getElementById('formulario').reset();
+    document.getElementById('id').value = '';
+    document.getElementById('titulo-form').textContent = 'Nuevo horario';
+    document.getElementById('guardar').textContent = 'Registrar horario';
+  });
+
+  document.getElementById('formulario').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const cuerpo = {
+      curso_id: Number(document.getElementById('curso_id').value),
+      dia: Number(document.getElementById('dia').value),
+      hora_inicio: document.getElementById('hora_inicio').value,
+      hora_fin: document.getElementById('hora_fin').value,
+      aula: document.getElementById('aula').value.trim(),
+    };
+
+    const id = document.getElementById('id').value;
+    const r = await api(id ? `horarios/${id}` : 'horarios', { metodo: id ? 'PUT' : 'POST', cuerpo });
+
+    if (!r.ok) { mostrarAlerta(alerta, r.mensaje); return; }  // mensaje claro de cruce
+
+    mostrarAlerta(alerta, r.mensaje, 'ok');
+    document.getElementById('limpiar').click();
+    cargar();
+  });
+
+  await cargar();
+});
+</script>
+</body>
+</html>

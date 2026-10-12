@@ -1,21 +1,74 @@
 <?php
 declare(strict_types=1);
 
-/** GET/POST /api/incidencias - el docente registra y lista sus incidencias. */
+/** GET/POST/PUT /api/incidencias - registro docente y gestion de la direccion. */
 final class IncidenciaController
 {
-    /** GET /api/incidencias?estado=pendiente */
+    /** GET /api/incidencias?estado=  (docente: las suyas | director: todas) */
     public function index(): never
     {
-        Auth::exigirRol('DOCENTE');
+        Auth::exigirRol('DOCENTE', 'DIRECTOR');
         $estado = (string)($_GET['estado'] ?? '');
 
         if ($estado !== '' && !in_array($estado, ['pendiente', 'en_proceso', 'resuelta'], true)) {
             Respuesta::error('Estado de incidencia no valido', 400);
         }
 
-        $incidencias = (new Incidencia())->porDocente($this->docenteId(), $estado);
+        $modelo = new Incidencia();
+        $incidencias = Auth::esDirector()
+            ? $modelo->listarTodas($estado)
+            : $modelo->porDocente($this->docenteId(), $estado);
+
         Respuesta::json($incidencias, 'Incidencias registradas: ' . count($incidencias));
+    }
+
+    /** PUT /api/incidencias/{id} - la direccion cambia estado y responde. */
+    public function actualizar(int $id): never
+    {
+        Auth::exigirRol('DIRECTOR');
+
+        $modelo = new Incidencia();
+        $incidencia = $modelo->porId($id);
+        if ($incidencia === null) {
+            Respuesta::error('Incidencia no encontrada', 404);
+        }
+
+        $datos = $this->entrada();
+        $permitidos = ['estado', 'respuesta_director'];
+        $datos = array_intersect_key($datos, array_flip($permitidos));
+
+        if (isset($datos['estado'])) {
+            if (!in_array($datos['estado'], ['pendiente', 'en_proceso', 'resuelta'], true)) {
+                Respuesta::error('Estado de incidencia no valido', 400);
+            }
+        }
+
+        if (isset($datos['respuesta_director'])) {
+            $datos['respuesta_director'] = trim((string)$datos['respuesta_director']);
+            if ($datos['respuesta_director'] !== '' && mb_strlen($datos['respuesta_director']) < 5) {
+                Respuesta::error('La respuesta debe tener al menos 5 caracteres', 400);
+            }
+            if ($datos['respuesta_director'] === '') {
+                $datos['respuesta_director'] = null;
+            }
+        }
+
+        if ($datos === []) {
+            Respuesta::error('No se envio ningun campo permitido', 400);
+        }
+
+        // Al resolver la incidencia se registra la fecha de respuesta
+        $estadoFinal = $datos['estado'] ?? $incidencia['estado'];
+        $fechaRespuesta = $estadoFinal === 'resuelta' ? date('Y-m-d H:i:s') : $incidencia['fecha_respuesta'];
+
+        $modelo->actualizarEstado(
+            $id,
+            $estadoFinal,
+            $datos['respuesta_director'] ?? $incidencia['respuesta_director'],
+            $fechaRespuesta
+        );
+
+        Respuesta::json($modelo->porId($id), 'Incidencia actualizada');
     }
 
     /** POST /api/incidencias - toda incidencia nace en estado pendiente. */

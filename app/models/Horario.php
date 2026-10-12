@@ -31,4 +31,49 @@ final class Horario extends ModeloBase
         }
         return $agrupado;
     }
+
+    /** Listado completo con curso y docente (pantalla de la direccion). */
+    public function listar(): array
+    {
+        $sql = 'SELECT h.*, c.nombre AS curso, c.grado, c.seccion, c.docente_id,
+                       u.nombres AS docente_nombres, u.apellidos AS docente_apellidos
+                FROM horarios h
+                INNER JOIN cursos c ON c.id = h.curso_id
+                INNER JOIN docentes d ON d.id = c.docente_id
+                INNER JOIN usuarios u ON u.id = d.usuario_id
+                ORDER BY h.dia, h.hora_inicio';
+
+        return $this->pdo()->query($sql)->fetchAll();
+    }
+
+    /**
+     * Busca cruces: mismo docente o misma aula, mismo dia y rangos solapados.
+     * Devuelve la fila que genera el conflicto.
+     */
+    public function buscarCruce(
+        int $dia,
+        string $horaInicio,
+        string $horaFin,
+        string $aula,
+        int $docenteId,
+        int $excluirId = 0
+    ): ?array {
+        $sql = 'SELECT h.*, c.nombre AS curso, c.docente_id,
+                       u.nombres AS docente_nombres, u.apellidos AS docente_apellidos
+                FROM horarios h
+                INNER JOIN cursos c ON c.id = h.curso_id
+                INNER JOIN docentes d ON d.id = c.docente_id
+                INNER JOIN usuarios u ON u.id = d.usuario_id
+                WHERE h.dia = ?
+                  AND h.hora_inicio < ?
+                  AND h.hora_fin > ?
+                  AND (c.docente_id = ? OR h.aula = ?)
+                  AND h.id <> ?';
+
+        $stmt = $this->pdo()->prepare($sql);
+        $stmt->execute([$dia, $horaFin, $horaInicio, $docenteId, $aula, $excluirId]);
+
+        $fila = $stmt->fetch();
+        return $fila === false ? null : $fila;
+    }
 }

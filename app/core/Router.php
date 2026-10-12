@@ -45,7 +45,8 @@ final class Router
             $args = [];
             foreach ($coincidencias as $clave => $valor) {
                 if (is_string($clave)) {
-                    $args[$clave] = $valor;
+                    // Los identificadores de la ruta se entregan como enteros
+                    $args[$clave] = ctype_digit($valor) ? (int)$valor : $valor;
                 }
             }
 

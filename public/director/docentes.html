@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Docentes - Direccion</title>
+<link rel="stylesheet" href="../assets/css/estilos.css">
+</head>
+<body>
+<div class="app" id="app"></div>
+
+<script type="module">
+import { iniciarPanel } from '../assets/js/layout.js';
+import { api } from '../assets/js/api.js';
+import { pintarTabla, badge } from '../assets/js/tabla.js';
+import { escapar, formatoDinero, mostrarAlerta } from '../assets/js/ui.js';
+
+iniciarPanel('DIRECTOR', async (contenedor) => {
+  contenedor.innerHTML = `
+    <h3 style="margin-bottom:14px">Registro de docentes</h3>
+    <div class="alerta" id="alerta"></div>
+
+    <div class="tarjeta" style="margin-bottom:16px">
+      <h3 style="margin-bottom:12px">Nuevo docente</h3>
+      <p style="margin-bottom:14px">El usuario y la contrasena se generan automaticamente y se muestran una sola vez.</p>
+      <form id="formulario">
+        <div class="rejilla dos">
+          <div>
+            <div class="campo"><label for="nombres">Nombres</label><input type="text" id="nombres" required></div>
+            <div class="campo"><label for="apellidos">Apellidos</label><input type="text" id="apellidos" required></div>
+            <div class="campo"><label for="dni">DNI (8 digitos)</label><input type="text" id="dni" maxlength="8" required></div>
+          </div>
+          <div>
+            <div class="campo"><label for="especialidad">Especialidad</label><input type="text" id="especialidad" required></div>
+            <div class="campo"><label for="email">Correo electronico</label><input type="email" id="email"></div>
+            <div class="campo"><label for="telefono">Telefono</label><input type="text" id="telefono"></div>
+            <div class="campo"><label for="sueldo">Sueldo mensual (S/)</label><input type="number" id="sueldo" min="0" step="0.01" value="1500"></div>
+          </div>
+        </div>
+        <button class="boton" type="submit">Registrar docente</button>
+      </form>
+    </div>
+
+    <div id="tabla"></div>
+
+    <div class="overlay" id="overlay">
+      <div class="modal">
+        <h3>Credenciales generadas</h3>
+        <p style="font-size:.86rem;color:var(--gris);margin-bottom:14px">
+          Copie estos datos ahora: la contrasena no se volvera a mostrar.</p>
+        <div class="datos-fijos">
+          <div class="dato"><span>Usuario</span><strong id="cred-usuario">-</strong></div>
+          <div class="dato"><span>Contrasena</span><strong id="cred-clave">-</strong></div>
+        </div>
+        <div class="modal-acciones">
+          <button class="boton" id="entendido">Entendido</button>
+        </div>
+      </div>
+    </div>`;
+
+  const tabla = document.getElementById('tabla');
+  const alerta = document.getElementById('alerta');
+  const overlay = document.getElementById('overlay');
+
+  async function cargar() {
+    const r = await api('docentes');
+    if (!r.ok) { mostrarAlerta(alerta, r.mensaje); return; }
+
+    pintarTabla(tabla, [
+      { titulo: 'Docente', render: (d) => `<strong>${escapar(d.nombres)} ${escapar(d.apellidos)}</strong><br>
+        <small style="color:var(--gris)">${escapar(d.especialidad)}</small>` },
+      { titulo: 'Usuario', render: (d) => escapar(d.usuario ?? '-') },
+      { titulo: 'DNI', clave: 'dni' },
+      { titulo: 'Correo', render: (d) => escapar(d.email ?? '-') },
+      { titulo: 'Sueldo', render: (d) => formatoDinero(d.sueldo) },
+      { titulo: 'Cursos', clave: 'cursos' },
+      { titulo: 'Estado', render: (d) => Number(d.activo) === 1 ? badge('Activo', 'verde') : badge('Inactivo', 'rojo') },
+    ], r.datos, 'No hay docentes registrados');
+  }
+
+  document.getElementById('formulario').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const r = await api('docentes', {
+      metodo: 'POST',
+      cuerpo: {
+        nombres: document.getElementById('nombres').value.trim(),
+        apellidos: document.getElementById('apellidos').value.trim(),
+        dni: document.getElementById('dni').value.trim(),
+        especialidad: document.getElementById('especialidad').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        telefono: document.getElementById('telefono').value.trim(),
+        sueldo: document.getElementById('sueldo').value,
+      },
+    });
+
+    if (!r.ok) { mostrarAlerta(alerta, r.mensaje); return; }
+
+    // Las credenciales se muestran una sola vez
+    document.getElementById('cred-usuario').textContent = r.datos.usuario;
+    document.getElementById('cred-clave').textContent = r.datos.contrasena;
+    overlay.classList.add('visible');
+
+    e.target.reset();
+    cargar();
+  });
+
+  document.getElementById('entendido').addEventListener('click', () => overlay.classList.remove('visible'));
+
+  await cargar();
+});
+</script>
+</body>
+</html>

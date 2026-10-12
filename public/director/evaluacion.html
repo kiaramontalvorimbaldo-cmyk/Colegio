@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Evaluacion docente - Direccion</title>
+<link rel="stylesheet" href="../assets/css/estilos.css">
+</head>
+<body>
+<div class="app" id="app"></div>
+
+<script type="module">
+import { iniciarPanel } from '../assets/js/layout.js';
+import { api } from '../assets/js/api.js';
+import { pintarTabla, badge } from '../assets/js/tabla.js';
+import { escapar, formatoFecha, mostrarAlerta } from '../assets/js/ui.js';
+
+const COLOR_PUNTAJE = { 5: 'verde', 4: 'azul', 3: 'ambar', 2: 'rojo', 1: 'rojo' };
+
+iniciarPanel('DIRECTOR', async (contenedor) => {
+  const [rd, rc] = await Promise.all([api('evaluaciones'), api('docentes')]);
+
+  contenedor.innerHTML = `
+    <h3 style="margin-bottom:14px">Evaluacion de docentes</h3>
+    <div class="alerta" id="alerta"></div>
+
+    <div class="tarjeta" style="margin-bottom:16px">
+      <form id="formulario">
+        <div class="rejilla dos">
+          <div>
+            <div class="campo"><label for="docente">Docente</label>
+              <select id="docente" required>
+                ${(rc.datos ?? []).map((d) => `<option value="${d.id}">${escapar(d.apellidos)}, ${escapar(d.nombres)}</option>`).join('')}
+              </select></div>
+            <div class="campo"><label for="puntaje">Puntaje (1 a 5)</label>
+              <select id="puntaje">
+                <option value="5">5 - Excelente</option>
+                <option value="4">4 - Bueno</option>
+                <option value="3">3 - Regular</option>
+                <option value="2">2 - Deficiente</option>
+                <option value="1">1 - Muy deficiente</option>
+              </select></div>
+            <div class="campo"><label for="fecha">Fecha</label>
+              <input type="date" id="fecha" value="${new Date().toISOString().slice(0, 10)}"></div>
+          </div>
+          <div>
+            <div class="campo"><label for="observaciones">Observaciones (obligatorias)</label>
+              <textarea id="observaciones" rows="5" maxlength="255"
+                        placeholder="Describa el desempenho observado en el aula" required></textarea></div>
+            <button class="boton" type="submit">Registrar evaluacion</button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <h3 style="margin:18px 0 10px">Promedio por docente</h3>
+    <div id="promedios"></div>
+
+    <h3 style="margin:18px 0 10px">Historial de evaluaciones</h3>
+    <div id="tabla"></div>`;
+
+  const tabla = document.getElementById('tabla');
+  const alerta = document.getElementById('alerta');
+
+  function pintarPromedios(datos) {
+    pintarTabla(document.getElementById('promedios'), [
+      { titulo: 'Docente', render: (p) => `<strong>${escapar(p.nombres)} ${escapar(p.apellidos)}</strong>` },
+      { titulo: 'Evaluaciones', clave: 'evaluaciones' },
+      { titulo: 'Promedio', render: (p) => `<strong>${p.promedio ?? '-'}</strong>` },
+    ], datos.filter((p) => Number(p.evaluaciones) > 0), 'Aun no hay evaluaciones');
+  }
+
+  async function cargar() {
+    const r = await api('evaluaciones');
+    if (!r.ok) { mostrarAlerta(alerta, r.mensaje); return; }
+
+    pintarPromedios(r.datos.promedios);
+    pintarTabla(tabla, [
+      { titulo: 'Docente', render: (e) => `${escapar(e.nombres)} ${escapar(e.apellidos)}<br>
+        <small style="color:var(--gris)">${escapar(e.especialidad)}</small>` },
+      { titulo: 'Puntaje', render: (e) => badge(e.puntaje + '/5', COLOR_PUNTAJE[e.puntaje] ?? 'azul') },
+      { titulo: 'Observaciones', render: (e) => escapar(e.observaciones) },
+      { titulo: 'Fecha', render: (e) => formatoFecha(e.fecha) },
+    ], r.datos.evaluaciones, 'No hay evaluaciones registradas');
+  }
+
+  document.getElementById('formulario').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const r = await api('evaluaciones', {
+      metodo: 'POST',
+      cuerpo: {
+        docente_id: Number(document.getElementById('docente').value),
+        puntaje: Number(document.getElementById('puntaje').value),
+        observaciones: document.getElementById('observaciones').value.trim(),
+        fecha: document.getElementById('fecha').value,
+      },
+    });
+
+    if (!r.ok) { mostrarAlerta(alerta, r.mensaje); return; }
+
+    mostrarAlerta(alerta, r.mensaje, 'ok');
+    e.target.reset();
+    cargar();
+  });
+
+  await cargar();
+});
+</script>
+</body>
+</html>

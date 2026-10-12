@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cursos - Direccion</title>
+<link rel="stylesheet" href="../assets/css/estilos.css">
+</head>
+<body>
+<div class="app" id="app"></div>
+
+<script type="module">
+import { iniciarPanel } from '../assets/js/layout.js';
+import { api } from '../assets/js/api.js';
+import { pintarTabla, badge } from '../assets/js/tabla.js';
+import { escapar, mostrarAlerta } from '../assets/js/ui.js';
+
+iniciarPanel('DIRECTOR', async (contenedor) => {
+  const rc = await api('cursos');
+  const rd = await api('docentes');
+
+  contenedor.innerHTML = `
+    <h3 style="margin-bottom:14px">Gestion de cursos</h3>
+    <div class="alerta" id="alerta"></div>
+
+    <div class="tarjeta" style="margin-bottom:16px">
+      <h3 id="titulo-form" style="margin-bottom:12px">Nuevo curso</h3>
+      <form id="formulario">
+        <input type="hidden" id="id">
+        <div class="rejilla dos">
+          <div>
+            <div class="campo"><label for="nombre">Nombre del curso</label>
+              <input type="text" id="nombre" required placeholder="Ej. Matematica"></div>
+            <div class="campo"><label for="periodo">Periodo</label>
+              <input type="text" id="periodo" required value="2026-1"></div>
+          </div>
+          <div>
+            <div class="campo"><label for="grado">Grado</label>
+              <input type="text" id="grado" required placeholder="Ej. 5to"></div>
+            <div class="campo"><label for="seccion">Seccion</label>
+              <input type="text" id="seccion" required maxlength="2" placeholder="Ej. A"></div>
+            <div class="campo"><label for="docente_id">Docente a cargo</label>
+              <select id="docente_id" required>
+                ${(rd.datos ?? []).map((d) => `<option value="${d.id}">${escapar(d.apellidos)}, ${escapar(d.nombres)}</option>`).join('')}
+              </select></div>
+          </div>
+        </div>
+        <button class="boton" type="submit" id="guardar">Registrar curso</button>
+        <button class="boton secundario" type="button" id="limpiar">Limpiar formulario</button>
+      </form>
+    </div>
+
+    <div id="tabla"></div>`;
+
+  const tabla = document.getElementById('tabla');
+  const alerta = document.getElementById('alerta');
+  let cursos = rc.datos ?? [];
+
+  async function cargar() {
+    const r = await api('cursos');
+    if (!r.ok) { mostrarAlerta(alerta, r.mensaje); return; }
+    cursos = r.datos;
+
+    pintarTabla(tabla, [
+      { titulo: 'Curso', render: (c) => `<strong>${escapar(c.nombre)}</strong>` },
+      { titulo: 'Grado', render: (c) => `${escapar(c.grado)} - ${escapar(c.seccion)}` },
+      { titulo: 'Periodo', clave: 'periodo' },
+      { titulo: 'Docente', render: (c) => `${escapar(c.docente_nombres)} ${escapar(c.docente_apellidos)}` },
+      { titulo: 'Horas', render: (c) => badge(Number(c.horas_semana) + ' h/sem', 'azul') },
+      { titulo: 'Acciones', render: (c) => `
+          <button class="boton secundario" data-editar="${c.id}">Editar</button>
+          <button class="boton peligro" data-borrar="${c.id}">Eliminar</button>` },
+    ], cursos, 'No hay cursos registrados');
+
+    tabla.querySelectorAll('[data-editar]').forEach((b) => b.addEventListener('click', () => editar(cursos.find((c) => String(c.id) === b.dataset.editar))));
+    tabla.querySelectorAll('[data-borrar]').forEach((b) => b.addEventListener('click', () => borrar(b.dataset.borrar)));
+  }
+
+  function editar(curso) {
+    document.getElementById('id').value = curso.id;
+    document.getElementById('nombre').value = curso.nombre;
+    document.getElementById('grado').value = curso.grado;
+    document.getElementById('seccion').value = curso.seccion;
+    document.getElementById('periodo').value = curso.periodo;
+    document.getElementById('docente_id').value = curso.docente_id;
+    document.getElementById('titulo-form').textContent = 'Editando: ' + curso.nombre;
+    document.getElementById('guardar').textContent = 'Actualizar curso';
+  }
+
+  async function borrar(id) {
+    const curso = cursos.find((c) => String(c.id) === String(id));
+    if (!confirm(`Eliminar el curso "${curso.nombre}" (${curso.grado}-${curso.seccion})? Tambien se borraran sus horarios.`)) return;
+
+    const r = await api(`cursos/${id}`, { metodo: 'DELETE' });
+    mostrarAlerta(alerta, r.mensaje, r.ok ? 'ok' : 'error');
+    if (r.ok) cargar();
+  }
+
+  document.getElementById('limpiar').addEventListener('click', () => {
+    document.getElementById('formulario').reset();
+    document.getElementById('id').value = '';
+    document.getElementById('titulo-form').textContent = 'Nuevo curso';
+    document.getElementById('guardar').textContent = 'Registrar curso';
+  });
+
+  document.getElementById('formulario').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const cuerpo = {
+      nombre: document.getElementById('nombre').value.trim(),
+      grado: document.getElementById('grado').value.trim(),
+      seccion: document.getElementById('seccion').value.trim(),
+      periodo: document.getElementById('periodo').value.trim(),
+      docente_id: Number(document.getElementById('docente_id').value),
+    };
+
+    const id = document.getElementById('id').value;
+    const r = await api(id ? `cursos/${id}` : 'cursos', { metodo: id ? 'PUT' : 'POST', cuerpo });
+
+    if (!r.ok) { mostrarAlerta(alerta, r.mensaje); return; }
+
+    mostrarAlerta(alerta, r.mensaje, 'ok');
+    document.getElementById('limpiar').click();
+    cargar();
+  });
+
+  await cargar();
+});
+</script>
+</body>
+</html>

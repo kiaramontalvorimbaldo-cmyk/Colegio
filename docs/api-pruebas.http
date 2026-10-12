@@ -172,3 +172,124 @@ Accept: application/json
 ### Reporte consolidado del docente -> 200
 GET {{base}}/docente/reportes
 Accept: application/json
+
+### ---------------- DIRECCION (Sprint 5) ----------------
+
+### Indicadores del panel -> 200
+GET {{base}}/director/resumen
+Accept: application/json
+
+### Incidencias de toda la institucion (el docente solo ve las suyas) -> 200
+GET {{base}}/incidencias?estado=pendiente
+Accept: application/json
+
+### Resolver incidencia con respuesta -> 200
+PUT {{base}}/incidencias/6
+Content-Type: application/json
+
+{
+  "estado": "resuelta",
+  "respuesta_director": "Se notifico al tutor del aula y se acordo un seguimiento con la familia."
+}
+
+### Alta de docente: devuelve usuario y contrasena (se muestra una sola vez) -> 201
+POST {{base}}/docentes
+Content-Type: application/json
+
+{
+  "nombres": "Rosa",
+  "apellidos": "Alvarado Medina",
+  "dni": "70551234",
+  "especialidad": "Matematicas",
+  "email": "ralvarado@sagradocorazon.edu.pe",
+  "telefono": "900555666",
+  "sueldo": 1550
+}
+
+### Evaluaciones + promedios por docente -> 200
+GET {{base}}/evaluaciones
+Accept: application/json
+
+### Registrar evaluacion -> 201
+POST {{base}}/evaluaciones
+Content-Type: application/json
+
+{
+  "docente_id": 1,
+  "puntaje": 4,
+  "observaciones": "Buen manejo del aula y cumplimiento de la programacion.",
+  "fecha": "2026-04-20"
+}
+
+### Puntaje fuera de rango -> 400
+POST {{base}}/evaluaciones
+Content-Type: application/json
+
+{
+  "docente_id": 1,
+  "puntaje": 9,
+  "observaciones": "Puntaje fuera del rango permitido"
+}
+
+### Crear curso -> 201
+POST {{base}}/cursos
+Content-Type: application/json
+
+{
+  "nombre": "Ciencia y Ambiente",
+  "grado": "5to",
+  "seccion": "A",
+  "periodo": "2026-1",
+  "docente_id": 3
+}
+
+### Curso duplicado (UNIQUE nombre+grado+seccion+periodo) -> 400
+POST {{base}}/cursos
+Content-Type: application/json
+
+{
+  "nombre": "Matematica",
+  "grado": "6to",
+  "seccion": "A",
+  "periodo": "2026-1",
+  "docente_id": 2
+}
+
+### Horario valido -> 201
+POST {{base}}/horarios
+Content-Type: application/json
+
+{
+  "curso_id": 1,
+  "dia": 5,
+  "hora_inicio": "07:00",
+  "hora_fin": "08:30",
+  "aula": "Lab-Computo"
+}
+
+### Cruce del mismo docente en el mismo dia -> 400
+POST {{base}}/horarios
+Content-Type: application/json
+
+{
+  "curso_id": 1,
+  "dia": 1,
+  "hora_inicio": "07:45",
+  "hora_fin": "09:15",
+  "aula": "A-201"
+}
+
+### Cruce por aula ocupada (docente distinto) -> 400
+POST {{base}}/horarios
+Content-Type: application/json
+
+{
+  "curso_id": 3,
+  "dia": 1,
+  "hora_inicio": "07:30",
+  "hora_fin": "09:00",
+  "aula": "A-201"
+}
+
+### Eliminar horario -> 200
+DELETE {{base}}/horarios/11
