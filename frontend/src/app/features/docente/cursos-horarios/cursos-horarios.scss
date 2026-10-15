@@ -1,0 +1,75 @@
+h2 { font-size: 1rem; color: #16305c; margin: 20px 0 10px; }
+
+.indicadores {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.indicador {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px;
+
+  mat-icon {
+    width: 46px;
+    height: 46px;
+    font-size: 46px;
+    display: grid;
+    place-items: center;
+    border-radius: 10px;
+    color: #2c4f86;
+    background: #eef3fb;
+    line-height: 46px;
+    text-align: center;
+    flex: 0 0 46px;
+  }
+
+  strong { display: block; font-size: 1.4rem; color: #16305c; }
+  span { font-size: 0.78rem; color: #6b7280; }
+}
+
+.grilla {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.columna h3 {
+  background: #16305c;
+  color: #fff;
+  font-size: 0.8rem;
+  text-align: center;
+  padding: 7px;
+  border-radius: 8px 8px 0 0;
+  margin: 0;
+}
+
+.clase {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-left: 3px solid #2c4f86;
+  border-radius: 8px;
+  padding: 9px 10px;
+  margin-bottom: 9px;
+  font-size: 0.78rem;
+
+  strong { display: block; color: #16305c; font-size: 0.79rem; margin-bottom: 3px; }
+  span { display: block; color: #6b7280; }
+  .aula { color: #2c4f86; font-weight: 600; }
+}
+
+.sin-clases { font-size: 0.76rem; color: #9ca3af; text-align: center; padding: 12px 0; }
+
+@media (max-width: 1200px) {
+  .grilla { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+@media (max-width: 768px) {
+  .grilla { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 576px) {
+  .grilla { grid-template-columns: minmax(0, 1fr); }
+}

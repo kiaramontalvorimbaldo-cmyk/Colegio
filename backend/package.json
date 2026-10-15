@@ -1,0 +1,27 @@
+{
+  "name": "sistema-academico-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "API REST del sistema de administración académica - I.E.P. Sagrado Corazón de Jesús",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "node --watch src/app.js",
+    "seed:sqlite": "node db/seed.js",
+    "db:migrate": "node scripts/migrate-sqlite.js",
+    "test": "node --test"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "better-sqlite3": "^12.4.1",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^2.0.2",
+    "pg": "^8.23.1"
+  }
+}

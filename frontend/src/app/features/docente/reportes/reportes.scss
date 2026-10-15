@@ -1,0 +1,42 @@
+h2 { font-size: 1rem; color: #16305c; margin: 20px 0 10px; }
+
+.indicadores {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.indicador {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px;
+
+  mat-icon {
+    width: 46px;
+    height: 46px;
+    font-size: 46px;
+    line-height: 46px;
+    text-align: center;
+    display: grid;
+    place-items: center;
+    border-radius: 10px;
+    color: #2c4f86;
+    background: #eef3fb;
+    flex: 0 0 46px;
+  }
+
+  strong { display: block; font-size: 1.4rem; color: #16305c; }
+  span { font-size: 0.78rem; color: #6b7280; }
+}
+
+.graficos {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  margin-top: 16px;
+}
+
+@media (max-width: 576px) {
+  .graficos { grid-template-columns: minmax(0, 1fr); }
+}

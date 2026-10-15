@@ -1,0 +1,68 @@
+<div class="shell">
+  <aside class="sidebar" [class.abierta]="menuAbierto()">
+    <div class="marca">
+      <mat-icon>school</mat-icon>
+      <div>
+        <strong>Sagrado Corazón</strong>
+        <span>{{ rol() === 'DIRECTOR' ? 'Dirección' : 'Docencia' }}</span>
+      </div>
+    </div>
+
+    <nav aria-label="Menú principal">
+      @for (grupo of menus(); track grupo.grupo) {
+        <p class="grupo">{{ grupo.grupo }}</p>
+        <ul>
+          @for (enlace of grupo.enlaces; track enlace.ruta) {
+            <li>
+              <a
+                [routerLink]="enlace.ruta"
+                routerLinkActive="activo"
+                [routerLinkActiveOptions]="{ exact: enlace.exacto ?? false }"
+                (click)="menuAbierto.set(false)"
+              >
+                <mat-icon aria-hidden="true">{{ enlace.icono }}</mat-icon>
+                <span>{{ enlace.titulo }}</span>
+              </a>
+            </li>
+          }
+        </ul>
+      }
+    </nav>
+
+    <p class="pie">Periodo 2026-1 · Chiclayo</p>
+  </aside>
+
+  @if (menuAbierto()) {
+    <div class="capa" (click)="menuAbierto.set(false)"></div>
+  }
+
+  <div class="contenido">
+    <mat-toolbar class="topbar">
+      <button mat-icon-button class="solo-movil" (click)="menuAbierto.set(!menuAbierto())" aria-label="Abrir menú">
+        <mat-icon>menu</mat-icon>
+      </button>
+
+      <span class="titulo">{{ rol() === 'DIRECTOR' ? 'Dirección' : 'Docencia' }}</span>
+
+      <div class="buscador">
+        <mat-icon aria-hidden="true">search</mat-icon>
+        <input type="search" placeholder="Buscar..." aria-label="Buscar en el sistema" />
+      </div>
+
+      <div class="perfil">
+        <div class="avatar" aria-hidden="true">{{ iniciales() }}</div>
+        <div class="datos">
+          <strong>{{ nombreCompleto() }}</strong>
+          <span>{{ rol() }}</span>
+        </div>
+        <button mat-stroked-button (click)="cerrarSesion()">
+          <mat-icon>logout</mat-icon> Salir
+        </button>
+      </div>
+    </mat-toolbar>
+
+    <main class="pagina">
+      <router-outlet />
+    </main>
+  </div>
+</div>

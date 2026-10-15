@@ -1,0 +1,30 @@
+# Dependencias
+node_modules/
+
+# Compilaciones de Angular
+dist/
+.angular/
+frontend/.angular/
+
+# Variables de entorno (nunca subir)
+.env
+.env.local
+
+# Base de datos SQLite generada
+*.db
+*.db-journal
+
+# Fotos de perfil cargadas por los usuarios
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# Sistema y editores
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Logs y temporales
+*.log
+npm-debug.log*

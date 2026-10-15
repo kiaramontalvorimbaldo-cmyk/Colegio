@@ -1,0 +1,50 @@
+<div class="fondo">
+  <mat-card class="caja">
+    <div class="logo" aria-hidden="true"><mat-icon>school</mat-icon></div>
+
+    <h1>Sistema de Administración Académica</h1>
+    <p class="subtitulo">I.E.P. Sagrado Corazón de Jesús · Chiclayo</p>
+
+    @if (error()) {
+      <p class="error" role="alert">{{ error() }}</p>
+    }
+
+    <form [formGroup]="formulario" (ngSubmit)="enviar()" novalidate>
+      <mat-form-field appearance="outline">
+        <mat-label>Usuario</mat-label>
+        <input matInput formControlName="usuario" autocomplete="username" placeholder="Ej. docente" />
+        <mat-icon matSuffix>person</mat-icon>
+        @if (usuario.hasError('required')) {
+          <mat-error>El usuario es obligatorio</mat-error>
+        } @else if (usuario.hasError('minlength')) {
+          <mat-error>Mínimo 3 caracteres</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Contraseña</mat-label>
+        <input matInput type="password" formControlName="clave" autocomplete="current-password" placeholder="Mínimo 6 caracteres" />
+        <mat-icon matSuffix>lock</mat-icon>
+        @if (clave.hasError('required')) {
+          <mat-error>La contraseña es obligatoria</mat-error>
+        } @else if (clave.hasError('minlength')) {
+          <mat-error>Mínimo 6 caracteres</mat-error>
+        }
+      </mat-form-field>
+
+      <button mat-flat-button type="submit" [disabled]="cargando()" class="boton">
+        @if (cargando()) {
+              Ingresando...
+            } @else {
+              Ingresar al sistema
+            }
+      </button>
+    </form>
+
+    <div class="demo">
+      <strong>Cuentas de prueba</strong>
+      <p>Director: <code>director</code> / <code>Director123*</code></p>
+      <p>Docente: <code>docente</code> / <code>Docente123*</code></p>
+    </div>
+  </mat-card>
+</div>

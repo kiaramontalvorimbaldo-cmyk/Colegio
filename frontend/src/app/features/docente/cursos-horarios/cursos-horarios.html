@@ -1,0 +1,36 @@
+<div class="indicadores">
+  <mat-card class="indicador">
+    <mat-icon aria-hidden="true">school</mat-icon>
+    <div><strong>{{ cursos().length }}</strong><span>Cursos a cargo</span></div>
+  </mat-card>
+  <mat-card class="indicador">
+    <mat-icon aria-hidden="true">schedule</mat-icon>
+    <div><strong>{{ totalHoras() }}</strong><span>Horas semanales</span></div>
+  </mat-card>
+  <mat-card class="indicador">
+    <mat-icon aria-hidden="true">groups</mat-icon>
+    <div><strong>{{ totalEstudiantes() }}</strong><span>Estudiantes</span></div>
+  </mat-card>
+</div>
+
+<h2>Mis cursos asignados</h2>
+<app-data-table [columnas]="columnas" [filas]="cursos()" vacio="No tiene cursos asignados" />
+
+<h2>Mi horario semanal</h2>
+<div class="grilla">
+  @for (dia of dias; track dia; let i = $index) {
+    <section class="columna" [attr.aria-label]="dia">
+      <h3>{{ dia }}</h3>
+      @for (clase of clasesDelDia(i); track clase.id) {
+        <article class="clase">
+          <strong>{{ clase.curso }}</strong>
+          <span>{{ clase.grado }} - {{ clase.seccion }}</span>
+          <span>{{ clase.hora_inicio.slice(0, 5) }} - {{ clase.hora_fin.slice(0, 5) }}</span>
+          <span class="aula">Aula {{ clase.aula }}</span>
+        </article>
+      } @empty {
+        <p class="sin-clases">Sin clases</p>
+      }
+    </section>
+  }
+</div>

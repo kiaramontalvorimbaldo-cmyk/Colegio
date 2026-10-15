@@ -1,0 +1,67 @@
+<mat-card class="registro">
+  <mat-card-header>
+    <mat-card-title>Registrar incidencia</mat-card-title>
+    <mat-card-subtitle>Se envía a la dirección en estado pendiente</mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    <form [formGroup]="formulario" (ngSubmit)="registrar()" class="formulario">
+      <div class="fila">
+        <mat-form-field appearance="outline">
+          <mat-label>Estudiante</mat-label>
+          <mat-select formControlName="estudiante_id">
+            @for (estudiante of estudiantes(); track estudiante.id) {
+              <mat-option [value]="estudiante.id">
+                {{ estudiante.apellidos }}, {{ estudiante.nombres }} ({{ estudiante.grado }}-{{ estudiante.seccion }})
+              </mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Tipo de incidencia</mat-label>
+          <mat-select formControlName="tipo">
+            @for (tipo of tipos; track tipo.valor) {
+              <mat-option [value]="tipo.valor">{{ tipo.etiqueta }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Fecha</mat-label>
+          <input matInput type="date" formControlName="fecha" />
+        </mat-form-field>
+      </div>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Descripción</mat-label>
+        <textarea matInput rows="4" maxlength="1000" formControlName="descripcion"
+                  placeholder="Detalle lo ocurrido en el aula (mínimo 10 caracteres)"></textarea>
+        @if (formulario.controls.descripcion.hasError('required')) {
+          <mat-error>La descripción es obligatoria</mat-error>
+        } @else if (formulario.controls.descripcion.hasError('minlength')) {
+          <mat-error>Mínimo 10 caracteres</mat-error>
+        }
+      </mat-form-field>
+
+      <button mat-flat-button type="submit" [disabled]="registrando()" class="enviar">
+        <mat-icon>report</mat-icon>
+        {{ registrando() ? 'Registrando...' : 'Registrar incidencia' }}
+      </button>
+    </form>
+  </mat-card-content>
+</mat-card>
+
+<div class="filtro">
+  <mat-form-field appearance="outline">
+    <mat-label>Filtrar por estado</mat-label>
+    <mat-select [value]="filtro()" (selectionChange)="cambiarFiltro($event.value)">
+      <mat-option value="">Todos</mat-option>
+      <mat-option value="pendiente">Pendiente</mat-option>
+      <mat-option value="en_proceso">En proceso</mat-option>
+      <mat-option value="resuelta">Resuelta</mat-option>
+    </mat-select>
+  </mat-form-field>
+</div>
+
+<app-data-table [columnas]="columnas" [filas]="lista()" vacio="No hay incidencias registradas" />

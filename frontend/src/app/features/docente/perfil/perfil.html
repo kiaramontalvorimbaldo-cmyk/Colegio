@@ -1,0 +1,74 @@
+<div class="rejilla">
+  <mat-card class="tarjeta">
+    <mat-card-header>
+      <mat-icon matCardAvatar aria-hidden="true">person</mat-icon>
+      <mat-card-title>Mi perfil</mat-card-title>
+      <mat-card-subtitle>Datos de contacto institucional</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      @if (cargando()) {
+        <p>Cargando perfil...</p>
+      } @else {
+        <div class="foto">
+          @if (fotoUrl()) { <img [src]="fotoUrl()" alt="Foto de perfil" /> } @else { <mat-icon aria-label="Sin foto de perfil">account_circle</mat-icon> }
+          <div>
+            <label mat-stroked-button class="boton-archivo">
+              <mat-icon>photo_camera</mat-icon> Subir foto
+              <input type="file" accept="image/png,image/jpeg,image/webp" (change)="cambiarFoto($event)" hidden />
+            </label>
+            <p class="ayuda">JPG, PNG o WEBP hasta 300 KB</p>
+          </div>
+        </div>
+
+        <form [formGroup]="formulario" (ngSubmit)="guardar()" class="formulario">
+          <mat-form-field appearance="outline">
+            <mat-label>Nombres</mat-label>
+            <input matInput formControlName="nombres" autocomplete="given-name" />
+            @if (formulario.controls.nombres.hasError('required')) {
+              <mat-error>Los nombres son obligatorios</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Apellidos</mat-label>
+            <input matInput formControlName="apellidos" autocomplete="family-name" />
+            @if (formulario.controls.apellidos.hasError('required')) {
+              <mat-error>Los apellidos son obligatorios</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Correo electrónico</mat-label>
+            <input matInput type="email" formControlName="email" autocomplete="email" />
+            @if (formulario.controls.email.hasError('email')) {
+              <mat-error>El correo no tiene un formato válido</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Teléfono</mat-label>
+            <input matInput formControlName="telefono" autocomplete="tel" />
+          </mat-form-field>
+
+          <button mat-flat-button type="submit" class="guardar">Guardar cambios</button>
+        </form>
+      }
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="tarjeta">
+    <mat-card-header>
+      <mat-card-title>Datos del docente</mat-card-title>
+      <mat-card-subtitle>Asignados por la dirección</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <dl class="datos">
+        <div><dt>Usuario</dt><dd>{{ auth.usuario()?.usuario }}</dd></div>
+        <div><dt>DNI</dt><dd>{{ dni() }}</dd></div>
+        <div><dt>Especialidad</dt><dd>{{ especialidad() }}</dd></div>
+        <div><dt>Perfil</dt><dd>{{ auth.usuario()?.rol }}</dd></div>
+      </dl>
+    </mat-card-content>
+  </mat-card>
+</div>

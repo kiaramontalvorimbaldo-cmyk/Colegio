@@ -1,0 +1,17 @@
+.registro { margin-bottom: 16px; }
+
+.formulario { display: flex; flex-direction: column; }
+
+.fila {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.enviar { align-self: flex-start; background: #2c4f86; color: #fff; }
+
+.filtro { max-width: 280px; margin-bottom: 12px; }
+
+@media (max-width: 992px) {
+  .fila { grid-template-columns: minmax(0, 1fr); }
+}

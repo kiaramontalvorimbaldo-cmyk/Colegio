@@ -1,0 +1,322 @@
+### Pruebas de la API - Sistema de Administración Académica
+@base = http://localhost:3000/api
+@token = PEGAR_AQUI_EL_TOKEN_DEL_LOGIN
+
+### ---------------- SPRINT 1 ----------------
+### Estado del servicio y de la base de datos -> 200
+GET {{base}}/salud
+Accept: application/json
+
+### ---------------- SPRINT 2 ----------------
+### Credenciales incorrectas -> 400
+POST {{base}}/auth/login
+Content-Type: application/json
+
+{
+  "usuario": "director",
+  "clave": "claveIncorrecta"
+}
+
+### Login del director -> 200 (copiar "datos.token" arriba)
+POST {{base}}/auth/login
+Content-Type: application/json
+
+{
+  "usuario": "director",
+  "clave": "Director123*"
+}
+
+### Sesión vigente del director -> 200
+GET {{base}}/auth/yo
+Authorization: Bearer {{token}}
+
+### Sin token -> 401
+GET {{base}}/auth/yo
+
+### Token inválido -> 401
+GET {{base}}/auth/yo
+Authorization: Bearer token.invalido.fake
+
+### Director en ruta exclusiva de docente -> 403
+GET {{base}}/pruebas/permiso-docente
+Authorization: Bearer {{token}}
+
+### Director en su propia ruta -> 200
+GET {{base}}/pruebas/permiso-director
+Authorization: Bearer {{token}}
+
+### Ruta inexistente -> 404
+GET {{base}}/no-existe
+Accept: application/json
+
+### ---------------- DOCENTE ----------------
+### Login del docente (docente / Docente123*) -> 200
+POST {{base}}/auth/login
+Content-Type: application/json
+
+{
+  "usuario": "docente",
+  "clave": "Docente123*"
+}
+### ---------------- SPRINT 3: DOCENTE ----------------
+### Perfil del docente (solo el propio) -> 200
+GET {{base}}/docente/perfil
+Authorization: Bearer {{token}}
+
+### Editar datos de contacto -> 200
+PUT {{base}}/docente/perfil
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "nombres": "Carlos Andrés",
+  "apellidos": "Quispe Rojas",
+  "email": "cquispe@sagradocorazon.edu.pe",
+  "telefono": "900 111 222"
+}
+
+### Email con formato invalido -> 400
+PUT {{base}}/docente/perfil
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{ "nombres": "Carlos", "apellidos": "Quispe", "email": "correo-malo" }
+
+### Subir foto de perfil (archivo, campo "foto") -> 200
+PUT {{base}}/docente/perfil/foto
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data
+
+### Cursos asignados del docente de la sesion -> 200
+GET {{base}}/docente/cursos
+Authorization: Bearer {{token}}
+
+### Horario semanal agrupado por dia -> 200
+GET {{base}}/docente/horario
+Authorization: Bearer {{token}}
+
+### Estudiantes a cargo -> 200
+GET {{base}}/docente/estudiantes
+Authorization: Bearer {{token}}
+
+### Bandeja de recibidos -> 200
+GET {{base}}/mensajes?carpeta=recibidos
+Authorization: Bearer {{token}}
+
+### Enviar mensaje a la direccion -> 201
+POST {{base}}/mensajes
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "asunto": "Solicitud de proyector",
+  "cuerpo": "Necesito un proyector adicional para el aula de 5to A."
+}
+
+### Mensaje sin asunto -> 400
+POST {{base}}/mensajes
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{ "asunto": "", "cuerpo": "Mensaje sin asunto" }
+### ---------------- SPRINT 4: ASISTENCIA, INCIDENCIAS Y REPORTES ----------------
+### Lista de estudiantes del curso con su estado del dia -> 200
+GET {{base}}/asistencias?curso_id=1&fecha=2026-03-11
+Authorization: Bearer {{token}}
+
+### Guardado masivo (crea) -> 200
+POST {{base}}/asistencias
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "curso_id": 1,
+  "fecha": "2026-05-11",
+  "registros": [
+    { "estudiante_id": 1, "estado": "presente" },
+    { "estudiante_id": 3, "estado": "falta" }
+  ]
+}
+
+### Re-guardar la misma fecha edita, no duplica (UNIQUE curso+estudiante+fecha) -> 200
+POST {{base}}/asistencias
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "curso_id": 1,
+  "fecha": "2026-05-11",
+  "registros": [ { "estudiante_id": 3, "estado": "justificada" } ]
+}
+
+### Estado invalido -> 400
+POST {{base}}/asistencias
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "curso_id": 1,
+  "fecha": "2026-05-11",
+  "registros": [ { "estudiante_id": 1, "estado": "volando" } ]
+}
+
+### Curso de otro docente -> 403
+GET {{base}}/asistencias?curso_id=3&fecha=2026-05-11
+Authorization: Bearer {{token}}
+
+### Registrar incidencia (nace en estado pendiente) -> 201
+POST {{base}}/incidencias
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "estudiante_id": 1,
+  "tipo": "conducta",
+  "descripcion": "Uso reiterado del celular durante la clase de programacion.",
+  "fecha": "2026-05-11"
+}
+
+### Incidencias del docente con filtro por estado -> 200
+GET {{base}}/incidencias?estado=pendiente
+Authorization: Bearer {{token}}
+
+### Reporte consolidado del docente -> 200
+GET {{base}}/docente/reportes
+Authorization: Bearer {{token}}
+### ---------------- SPRINT 5: DIRECCION ----------------
+### Indicadores del panel -> 200
+GET {{base}}/director/resumen
+Authorization: Bearer {{token}}
+
+### Incidencias de toda la institucion (el docente solo ve las suyas) -> 200
+GET {{base}}/incidencias?estado=pendiente
+Authorization: Bearer {{token}}
+
+### Resolver incidencia con respuesta -> 200
+PUT {{base}}/incidencias/6
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "estado": "resuelta",
+  "respuesta_director": "Se notifico al tutor del aula y se acordo un seguimiento con la familia."
+}
+
+### Alta de docente: devuelve usuario y contrasena (se muestra una sola vez) -> 201
+POST {{base}}/docentes
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "nombres": "Rosa",
+  "apellidos": "Alvarado Medina",
+  "dni": "70551234",
+  "especialidad": "Matematicas",
+  "email": "ralvarado@sagradocorazon.edu.pe",
+  "telefono": "900555666",
+  "sueldo": 1550
+}
+
+### Evaluaciones + promedios por docente -> 200
+GET {{base}}/evaluaciones
+Authorization: Bearer {{token}}
+
+### Registrar evaluacion -> 201
+POST {{base}}/evaluaciones
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{ "docente_id": 1, "puntaje": 4, "observaciones": "Buen manejo del aula y cumplimiento de la programacion.", "fecha": "2026-05-01" }
+
+### Puntaje fuera de rango -> 400
+POST {{base}}/evaluaciones
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{ "docente_id": 1, "puntaje": 9, "observaciones": "Puntaje fuera del rango permitido" }
+
+### Crear curso -> 201
+POST {{base}}/cursos
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{ "nombre": "Ciencia y Ambiente", "grado": "5to", "seccion": "A", "periodo": "2026-1", "docente_id": 3 }
+
+### Curso duplicado -> 400
+POST {{base}}/cursos
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{ "nombre": "Matematica", "grado": "6to", "seccion": "A", "periodo": "2026-1", "docente_id": 2 }
+
+### Horario sin conflicto -> 201
+POST {{base}}/horarios
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{ "curso_id": 1, "dia": 5, "hora_inicio": "07:00", "hora_fin": "08:30", "aula": "Lab-Computo" }
+
+### Cruce del mismo docente en el mismo dia -> 400
+POST {{base}}/horarios
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{ "curso_id": 1, "dia": 1, "hora_inicio": "07:45", "hora_fin": "09:15", "aula": "A-201" }
+
+### Cruce por aula ocupada (docente distinto) -> 400
+POST {{base}}/horarios
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{ "curso_id": 3, "dia": 1, "hora_inicio": "07:30", "hora_fin": "09:00", "aula": "A-201" }
+### ---------------- SPRINT 6: UGEL, PLANTILLAS Y ECONOMIA ----------------
+### Contactos de la UGEL -> 200
+GET {{base}}/ugel/contactos
+Authorization: Bearer {{token}}
+
+### Mensaje del director a un docente -> 201
+POST {{base}}/mensajes
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{ "tipo_destino": "usuario", "destinatario_id": 3, "asunto": "Felicitacion", "cuerpo": "Su manejo del aula fue destacado." }
+
+### Mensaje del director a la UGEL -> 201
+POST {{base}}/mensajes
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{ "tipo_destino": "ugel", "destinatario_ugel_id": 1, "asunto": "Informe academico 2026-1", "cuerpo": "Adjuntamos el informe de gestion academica." }
+
+### Destino inexistente -> 400
+POST {{base}}/mensajes
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{ "tipo_destino": "usuario", "destinatario_id": 99, "asunto": "x", "cuerpo": "y" }
+
+### Plantillas UGEL -> 200
+GET {{base}}/plantillas
+Authorization: Bearer {{token}}
+
+### Documento generado con los datos institucionales ya puestos -> 200
+GET {{base}}/plantillas/1/generar
+Authorization: Bearer {{token}}
+
+### Indicadores economicos -> 200
+GET {{base}}/economia/resumen
+Authorization: Bearer {{token}}
+
+### Cambiar pension, estudiantes y gastos: recalcula todo -> 200
+PUT {{base}}/economia/parametros
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{ "pension_mensual": 420, "num_estudiantes": 32, "gastos_operativos": 5000, "meses": 5 }
+
+### Meses fuera de rango -> 400
+PUT {{base}}/economia/parametros
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{ "meses": 15 }

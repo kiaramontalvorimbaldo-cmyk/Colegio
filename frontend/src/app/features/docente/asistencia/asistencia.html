@@ -1,0 +1,88 @@
+<mat-card class="filtros">
+  <mat-card-content>
+    <mat-form-field appearance="outline">
+      <mat-label>Curso</mat-label>
+      <mat-select [value]="cursoId()" (selectionChange)="cambiarCurso($event.value)">
+        @for (curso of cursos(); track curso.id) {
+          <mat-option [value]="curso.id">{{ curso.nombre }} - {{ curso.grado }} {{ curso.seccion }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Fecha</mat-label>
+      <input matInput type="date" [value]="fecha()" (change)="cambiarFecha($any($event.target).value)" />
+    </mat-form-field>
+
+    <div class="acciones">
+      <button mat-stroked-button type="button" (click)="marcarTodos('presente')">
+        <mat-icon>done_all</mat-icon> Marcar todos presentes
+      </button>
+      <button mat-flat-button type="button" [disabled]="guardando()" (click)="guardar()">
+        <mat-icon>save</mat-icon>
+        {{ guardando() ? 'Guardando...' : 'Guardar asistencia' }}
+      </button>
+    </div>
+  </mat-card-content>
+</mat-card>
+
+@if (estudiantes().length > 0) {
+  <div class="resumen">
+    @for (item of estados; track item.valor) {
+      @if (resumen()[item.valor]; as total) {
+        <span class="pastilla" [attr.data-estado]="item.valor">
+          {{ item.etiqueta }}: {{ total }}
+        </span>
+      }
+    }
+  </div>
+}
+
+@if (cargando()) {
+  <p>Cargando estudiantes...</p>
+} @else {
+  <div class="marco">
+    <table>
+      <thead>
+        <tr>
+          <th scope="col">Estudiante</th>
+          <th scope="col">DNI</th>
+          <th scope="col">Estado</th>
+          <th scope="col">Registro</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (estudiante of estudiantes(); track estudiante.id) {
+          <tr>
+            <td>{{ estudiante.nombres }} {{ estudiante.apellidos }}</td>
+            <td>{{ estudiante.dni }}</td>
+            <td>
+              <mat-form-field appearance="outline" class="campo-estado" subscriptSizing="dynamic">
+                <mat-select
+                  [value]="estudiante.estado"
+                  (selectionChange)="cambiarEstado(estudiante.id, $event.value)"
+                  [attr.aria-label]="'Estado de asistencia de ' + estudiante.nombres"
+                >
+                  @for (item of estados; track item.valor) {
+                    <mat-option [value]="item.valor">{{ item.etiqueta }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+            </td>
+            <td>
+              @if (estudiante.asistencia_id) {
+                <span class="badge verde">Registrada</span>
+              } @else {
+                <span class="badge ambar">Nueva</span>
+              }
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="4" class="vacio">No hay estudiantes en este curso</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}

@@ -1,0 +1,47 @@
+.rejilla {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  align-items: start;
+}
+
+.pestanas {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid #e5e7eb;
+
+  button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    padding: 9px 14px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #6b7280;
+
+    &.activa { color: #16305c; border-bottom-color: #16305c; }
+  }
+}
+
+.contador {
+  background: #d97706;
+  color: #fff;
+  border-radius: 20px;
+  padding: 1px 7px;
+  font-size: 0.7rem;
+}
+
+.redactar { padding: 6px; }
+
+.formulario { display: flex; flex-direction: column; }
+
+.enviar { background: #2c4f86; color: #fff; }
+
+@media (max-width: 992px) {
+  .rejilla { grid-template-columns: minmax(0, 1fr); }
+}
